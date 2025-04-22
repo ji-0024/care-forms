@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>介護保険申請フォーム</title>
+</head>
+<body>
+  <h1>介護保険申請フォーム</h1>
+  <p>以下の項目をご入力のうえ、「PDF生成」ボタンを押してください。</p>
+
+  <form id="careForm">
+    <label>氏名：<input type="text" id="name" required></label><br>
+    <label>生年月日：<input type="date" id="dob" required></label><br>
+    <!-- 他の項目は追って追加します -->
+    <button type="button" onclick="generatePDF()">PDF生成</button>
+  </form>
+
+  <script src="form.js"></script>
+</body>
+</html>
