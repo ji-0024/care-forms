@@ -2,64 +2,118 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <!-- Disable Chrome translation -->
   <meta name="google" content="notranslate">
   <title>介護保険申請フォーム</title>
-  <!-- PDF-LIB to manipulate PDF -->
   <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
-  <!-- FileSaver.js to save files -->
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <style>
+    label { display: block; margin: 8px 0; }
+    .inline > * { display: inline-block; margin-right: 8px; }
+  </style>
 </head>
 <body>
   <h1>介護保険申請フォーム</h1>
-  <p>以下の項目をご入力のうえ、「PDF生成」ボタンを押してください。</p>
-
   <form id="careForm">
-    <label>申請年月日：<input type="date" id="applicationDate" required></label><br>
-    <label>介護保険被保険者番号：<input type="text" id="insuredNumber" required></label><br>
-    <label>マイナンバー：<input type="text" id="myNumber" required></label><br>
-    <label>（医療保険）保険者名：<input type="text" id="insurerName" required></label><br>
-    <label>（医療保険）保険者番号：<input type="text" id="insurerNumber" required></label><br>
-    <label>（医療保険）記号：<input type="text" id="medicalSymbol" required></label><br>
-    <label>（医療保険）番号：<input type="text" id="medicalNumber" required></label><br>
-    <label>（医療保険）枝番：<input type="text" id="medicalBranch" required></label><br>
-    <label>フリガナ：<input type="text" id="furigana" required></label><br>
-    <label>氏名：<input type="text" id="name" required></label><br>
+    <!-- 既存の項目省略 -->
+    
+    <!-- 要介護区分 -->
+    <label>要介護区分:
+      <select id="careLevel" required>
+        <option value="">--選択--</option>
+        <option>要支援1</option>
+        <option>要支援2</option>
+        <option>要介護1</option>
+        <option>要介護2</option>
+        <option>要介護3</option>
+        <option>要介護4</option>
+        <option>要介護5</option>
+      </select>
+    </label>
 
-    <!-- 生年月日（和暦）：元号・年・月・日のプルダウンを同一行に表示 -->
-    <label>生年月日（和暦）：
-      <select id="era" required>
-        <option value="">--元号--</option>
-        <option value="明治">明治</option>
-        <option value="大正">大正</option>
-        <option value="昭和">昭和</option>
-        <option value="平成">平成</option>
-        <option value="令和">令和</option>
-      </select>
-      <select id="eraYear" required>
-        <option value="">--年--</option>
-      </select>
-      <select id="month" required>
-        <option value="">--月--</option>
-      </select>
-      <select id="day" required>
-        <option value="">--日--</option>
-      </select>
-    </label><br>
+    <!-- 有効期間 -->
+    <label>有効期間:
+      <span class="inline">
+        <select id="validEraStart" required> <!-- 元号プル -->
+          <option value="">--元号--</option>
+          <option>令和</option><option>平成</option>
+        </select>
+        <select id="validYearStart" required><option value="">--年--</option></select>
+        <select id="validMonthStart" required><option value="">--月--</option></select>
+        <select id="validDayStart" required><option value="">--日--</option></select>
+      </span>
+      ～
+      <span class="inline">
+        <select id="validEraEnd" required>
+          <option value="">--元号--</option>
+          <option>令和</option><option>平成</option>
+        </select>
+        <select id="validYearEnd" required><option value="">--年--</option></select>
+        <select id="validMonthEnd" required><option value="">--月--</option></select>
+        <select id="validDayEnd" required><option value="">--日--</option></select>
+      </span>
+    </label>
 
-    <label>性別：
-      <select id="gender" required>
-        <option value="">選択してください</option>
-        <option value="男">男</option>
-        <option value="女">女</option>
-      </select>
-    </label><br>
+    <!-- 過去6ヶ月入院・入所 -->
+    <fieldset>
+      <legend>過去6ヶ月の入院・入所</legend>
+      <label>介護保険施設の名称等：<input type="text" id="facilityName"></label>
+      <label>期間：
+        <span class="inline">
+          <select id="fEraStart"><option>令和</option></select>
+          <select id="fYearStart"><option>--年--</option></select>
+          <select id="fMonthStart"><option>--月--</option></select>
+          <select id="fDayStart"><option>--日--</option></select>
+        </span>
+        ～
+        <span class="inline">
+          <select id="fEraEnd"><option>令和</option></select>
+          <select id="fYearEnd"><option>--年--</option></select>
+          <select id="fMonthEnd"><option>--月--</option></select>
+          <select id="fDayEnd"><option>--日--</option></select>
+        </span>
+      </label>
+      <label>医療機関等の名称等：<input type="text" id="medicalName"></label>
+      <label>期間：（同上スクリプトでIDをmedicalEraStart などに置換）</label>
+    </fieldset>
 
-    <label>住所：<input type="text" id="address" required></label><br>
+    <!-- 申請書提出者 -->
+    <fieldset>
+      <legend>申請書提出者</legend>
+      <label>代行事業所：
+        <select id="agentType">
+          <option value="">--選択--</option>
+          <option>指定居宅介護支援事業所</option>
+          <option>介護老人保健施設</option>
+          <option>介護医療院</option>
+          <option>地域包括支援センター</option>
+          <option>指定介護老人福祉施設</option>
+        </select>
+      </label>
+      <label>名称：<input type="text" id="agentName"></label>
+      <label>所在地：<input type="text" id="agentAddress"></label>
+      <label>電話番号：<input type="text" id="agentTel"></label>
+      <p>上記以外の場合</p>
+      <label>氏名・名称：<input type="text" id="agentOtherName"></label>
+      <label>本人との関係：<input type="text" id="relation"></label>
+      <label>住所：<input type="text" id="agentOtherAddress"></label>
+      <label>電話番号：<input type="text" id="agentOtherTel"></label>
+    </fieldset>
+
+    <!-- 主治医 -->
+    <fieldset>
+      <legend>主治医</legend>
+      <label>医師氏名：<input type="text" id="doctorName"></label>
+      <label>医療機関：<input type="text" id="doctorHospital"><button type="button" id="searchDoctor">検索</button></label>
+      <label>所在地：<input type="text" id="doctorAddress"></label>
+      <label>電話番号：<input type="text" id="doctorTel"></label>
+    </fieldset>
+
+    <!-- 2号被保険者のみ -->
+    <label>特定疾病名（2号被保険者のみ）：<input type="text" id="diseaseName"></label>
+
     <button type="button" onclick="generatePDF()">PDF生成</button>
   </form>
 
-  <!-- Load form.js after the form -->
   <script src="form.js"></script>
 </body>
 </html>
