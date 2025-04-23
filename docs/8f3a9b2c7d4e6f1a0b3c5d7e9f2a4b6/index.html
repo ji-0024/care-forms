@@ -3,18 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <title>介護保険申請フォーム</title>
-  <!-- ここから追加 -->
   <!-- PDF-LIB: 既存PDFを読み込んでテキストを重ねるライブラリ -->
   <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
   <!-- FileSaver.js: ブラウザで生成データをファイル保存するライブラリ -->
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
-  <!-- ここまで追加 -->
 </head>
 <body>
   <h1>介護保険申請フォーム</h1>
   <p>以下の項目をご入力のうえ、「PDF生成」ボタンを押してください。</p>
 
-    <form id="careForm">
+  <form id="careForm">
     <label>申請年月日：<input type="date" id="applicationDate" required></label><br>
     <label>介護保険被保険者番号：<input type="text" id="insuredNumber" required></label><br>
     <label>マイナンバー：<input type="text" id="myNumber" required></label><br>
@@ -25,7 +23,33 @@
     <label>（医療保険）枝番：<input type="text" id="medicalBranch" required></label><br>
     <label>フリガナ：<input type="text" id="furigana" required></label><br>
     <label>氏名：<input type="text" id="name" required></label><br>
-    <label>生年月日：<input type="date" id="dob" required></label><br>
+
+    <label>生年月日（和暦）：</label><br>
+    <label>
+      元号：
+      <select id="era" required>
+        <option value="">--元号--</option>
+        <option value="明治">明治</option>
+        <option value="大正">大正</option>
+        <option value="昭和">昭和</option>
+        <option value="平成">平成</option>
+        <option value="令和">令和</option>
+      </select>
+    </label>
+    <label>
+      月：
+      <select id="month" required>
+        <option value="">--月--</option>
+      </select>
+    </label>
+    <label>
+      日：
+      <select id="day" required>
+        <option value="">--日--</option>
+      </select>
+    </label>
+    <br>
+
     <label>性別：
       <select id="gender" required>
         <option value="">選択してください</option>
@@ -37,7 +61,7 @@
     <button type="button" onclick="generatePDF()">PDF生成</button>
   </form>
 
-
+  <!-- form.js を最後に読み込む -->
   <script src="form.js"></script>
 </body>
 </html>
