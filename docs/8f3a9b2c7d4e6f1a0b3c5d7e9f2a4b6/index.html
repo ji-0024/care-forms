@@ -11,7 +11,7 @@
     fieldset { margin: 16px 0; padding: 12px; }
     legend { font-weight: bold; }
     .inline { display: flex; flex-wrap: wrap; gap: 8px; }
-    label { margin-right: 4px; white-space: nowrap; }
+    label { margin-right: 4px; }
     select, input { margin-right: 16px; }
   </style>
 </head>
@@ -49,33 +49,24 @@
         <label for="furigana">フリガナ</label>
         <input type="text" id="furigana" autocomplete="off" required>
       </div>
-      <!-- 生年月日（和暦） -->
       <div class="inline">
-        <label for="era">生年月日（和暦）元号</label>
+        <label for="era">元号</label>
         <select id="era" autocomplete="bday-era" required>
           <option value="">元号</option>
           <option>明治</option><option>大正</option><option>昭和</option><option>平成</option><option>令和</option>
         </select>
         <label for="eraYear">年</label>
-        <select id="eraYear" autocomplete="bday-year" required>
-          <option value="">年</option>
-        </select>
+        <select id="eraYear" autocomplete="bday-year" required><option value="">年</option></select>
         <label for="month">月</label>
-        <select id="month" autocomplete="bday-month" required>
-          <option value="">月</option>
-        </select>
+        <select id="month" autocomplete="bday-month" required><option value="">月</option></select>
         <label for="day">日</label>
-        <select id="day" autocomplete="bday-day" required>
-          <option value="">日</option>
-        </select>
+        <select id="day" autocomplete="bday-day" required><option value="">日</option></select>
       </div>
       <div class="inline">
         <label for="name">氏名</label>
         <input type="text" id="name" autocomplete="name" required>
         <label for="gender">性別</label>
-        <select id="gender" autocomplete="sex" required>
-          <option value="">選択</option><option>男</option><option>女</option>
-        </select>
+        <select id="gender" autocomplete="sex" required><option value="">選択</option><option>男</option><option>女</option></select>
       </div>
       <div class="inline">
         <label for="address">住所</label>
@@ -100,42 +91,128 @@
       </div>
       <div class="inline">
         <label for="validEraStart">有効期間開始</label>
-        <select id="validEraStart" autocomplete="off" required>
-          <option value="">元号</option><option>令和</option><option>平成</option>
-        </select>
+        <select id="validEraStart" autocomplete="off" required><option value="">元号</option><option>令和</option><option>平成</option></select>
         <label for="validYearStart">年</label>
-        <select id="validYearStart" autocomplete="off" required>
-          <option value="">年</option>
-        </select>
+        <select id="validYearStart" autocomplete="off" required><option value="">年</option></select>
         <label for="validMonthStart">月</label>
-        <select id="validMonthStart" autocomplete="off" required>
-          <option value="">月</option>
-        </select>
+        <select id="validMonthStart" autocomplete="off" required><option value="">月</option></select>
         <label for="validDayStart">日</label>
-        <select id="validDayStart" autocomplete="off" required>
-          <option value="">日</option>
-        </select>
+        <select id="validDayStart" autocomplete="off" required><option value="">日</option></select>
         <span>～</span>
         <label for="validEraEnd">有効期間終了</label>
-        <select id="validEraEnd" autocomplete="off" required>
-          <option value="">元号</option><option>令和</option><option>平成</option>
-        </select>
+        <select id="validEraEnd" autocomplete="off" required><option value="">元号</option><option>令和</option><option>平成</option></select>
         <label for="validYearEnd">年</label>
-        <select id="validYearEnd" autocomplete="off" required>
-          <option value="">年</option>
-        </select>
+        <select id="validYearEnd" autocomplete="off" required><option value="">年</option></select>
         <label for="validMonthEnd">月</label>
-        <select id="validMonthEnd" autocomplete="off" required>
-          <option value="">月</option>
-        </select>
+        <select id="validMonthEnd" autocomplete="off" required><option value="">月</option></select>
         <label for="validDayEnd">日</label>
-        <select id="validDayEnd" autocomplete="off" required>
-          <option value="">日</option>
-        </select>
+        <select id="validDayEnd" autocomplete="off" required><option value="">日</option></select>
       </div>
     </fieldset>
 
-    <!-- その他の項目 -->
+    <!-- 過去6ヶ月 -->
+    <fieldset>
+      <legend>過去6ヶ月の入院・入所</legend>
+      <div class="inline">
+        <label for="facilityName">施設名</label>
+        <input type="text" id="facilityName" autocomplete="off">
+      </div>
+      <div class="inline">
+        <label for="facilityEraStart">開始</label>
+        <select id="facilityEraStart" autocomplete="off"></select>
+        <label for="facilityYearStart">年</label>
+        <select id="facilityYearStart" autocomplete="off"></select>
+        <label for="facilityMonthStart">月</label>
+        <select id="facilityMonthStart" autocomplete="off"></select>
+        <label for="facilityDayStart">日</label>
+        <select id="facilityDayStart" autocomplete="off"></select>
+        <span>～</span>
+        <label for="facilityEraEnd">終了</label>
+        <select id="facilityEraEnd" autocomplete="off"></select>
+        <label for="facilityYearEnd">年</label>
+        <select id="facilityYearEnd" autocomplete="off"></select>
+        <label for="facilityMonthEnd">月</label>
+        <select id="facilityMonthEnd" autocomplete="off"></select>
+        <label for="facilityDayEnd">日</label>
+        <select id="facilityDayEnd" autocomplete="off"></select>
+      </div>
+      <div class="inline">
+        <label for="medicalName">医療機関名</label>
+        <input type="text" id="medicalName" autocomplete="off">
+      </div>
+      <div class="inline">
+        <label for="medicalEraStart">開始</label>
+        <select id="medicalEraStart" autocomplete="off"></select>
+        <label for="medicalYearStart">年</label>
+        <select id="medicalYearStart" autocomplete="off"></select>
+        <label for="medicalMonthStart">月</label>
+        <select id="medicalMonthStart" autocomplete="off"></select>
+        <label for="medicalDayStart">日</label>
+        <select id="medicalDayStart" autocomplete="off"></select>
+        <span>～</span>
+        <label for="medicalEraEnd">終了</label>
+        <select id="medicalEraEnd" autocomplete="off"></select>
+        <label for="medicalYearEnd">年</label>
+        <select id="medicalYearEnd" autocomplete="off"></select>
+        <label for="medicalMonthEnd">月</label>
+        <select id="medicalMonthEnd" autocomplete="off"></select>
+        <label for="medicalDayEnd">日</label>
+        <select id="medicalDayEnd" autocomplete="off"></select>
+      </div>
+    </fieldset>
+
+    <!-- 提出者 -->
+    <fieldset>
+      <legend>申請書提出者</legend>
+      <div class="inline">
+        <label for="agentType">種別</label>
+        <select id="agentType" autocomplete="off"><option>--選択--</option><option>指定居宅介護支援事業所</option><option>介護老人保健施設</option><option>介護医療院</option><option>地域包括支援センター</option><option>指定介護老人福祉施設</option></select>
+      </div>
+      <div class="inline">
+        <label for="agentName">名称</label>
+        <input type="text" id="agentName" autocomplete="off">
+        <label for="agentAddress">所在地</label>
+        <input type="text" id="agentAddress" autocomplete="off">
+        <label for="agentTel">電話番号</label>
+        <input type="tel" id="agentTel" autocomplete="tel">
+      </div>
+      <p>上記以外の場合</p>
+      <div class="inline">
+        <label for="agentOtherName">氏名/名称</label>
+        <input type="text" id="agentOtherName" autocomplete="off">
+        <label for="relation">本人との関係</label>
+        <input type="text" id="relation" autocomplete="off">
+      </div>
+      <div class="inline">
+        <label for="agentOtherAddress">住所</label>
+        <input type="text" id="agentOtherAddress" autocomplete="street-address">
+        <label for="agentOtherTel">電話番号</label>
+        <input type="tel" id="agentOtherTel" autocomplete="tel">
+      </div>
+    </fieldset>
+
+    <!-- 主治医 -->
+    <fieldset>
+      <legend>主治医</legend>
+      <div class="inline">
+        <label for="doctorName">医師氏名</label>
+        <input type="text" id="doctorName" autocomplete="name">
+        <label for="doctorHospital">医療機関</label>
+        <input type="text" id="doctorHospital" autocomplete="off">
+        <button type="button" id="searchDoctor">検索</button>
+      </div>
+      <div class="inline">
+        <label for="doctorAddress">所在地</label>
+        <input type="text" id="doctorAddress" autocomplete="street-address">
+        <label for="doctorTel">電話番号</label>
+        <input type="tel" id="doctorTel" autocomplete="tel">
+      </div>
+    </fieldset>
+
+    <!-- 2号被保険者 -->
+    <label for="diseaseName">特定疾病名（2号被保険者のみ）</label>
+    <input type="text" id="diseaseName" autocomplete="off"><br>
+
     <button type="button" onclick="generatePDF()">PDF生成</button>
   </form>
   <script src="form.js"></script>
