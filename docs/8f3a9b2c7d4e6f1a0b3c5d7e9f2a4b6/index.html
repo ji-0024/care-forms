@@ -17,8 +17,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const daySel      = document.getElementById('day');
 
   // Populate era options
-  ['明治', '大正', '昭和', '平成', '令和'].forEach(era => {
-    eraSelect.add(new Option(era, era));
+  ['明治', '大正', '昭和', '平成', '令和'].forEach(e => {
+    eraSelect.add(new Option(e, e));
   });
 
   // Populate month options (1-12)
@@ -33,37 +33,32 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // When era changes, regenerate year options based on current year
   eraSelect.addEventListener('change', () => {
-    // Reset year dropdown
     eraYearSel.innerHTML = '<option value="">--年--</option>';
     const selectedEra = eraSelect.value;
     if (!eraMap[selectedEra]) return;
-
-    const baseYear = eraMap[selectedEra];
+    const base = eraMap[selectedEra];
     const currentYear = new Date().getFullYear();
-    // Calculate max era year: currentYear - baseYear + 1
-    const maxEraYear = currentYear - baseYear + 1;
-    for (let y = 1; y <= maxEraYear; y++) {
+    const maxYear = currentYear - base + 1;
+    for (let y = 1; y <= maxYear; y++) {
       eraYearSel.add(new Option(`${y}年`, y));
     }
   });
 });
 
-// Function to convert Japanese era selection to ISO date string
+// Convert Japanese era selection to ISO date string
 function getBirthDateISO() {
   const era = document.getElementById('era').value;
-  const y   = parseInt(document.getElementById('eraYear').value);
+  const y   = parseInt(document.getElementById('eraYear').value, 10);
   const m   = String(document.getElementById('month').value).padStart(2, '0');
   const d   = String(document.getElementById('day').value).padStart(2, '0');
 
   if (!eraMap[era] || isNaN(y)) return '';
-  // Era year to Gregorian: baseYear + year - 1
   const year = eraMap[era] + y - 1;
   return `${year}-${m}-${d}`;
 }
 
 // Main function to generate and download PDF
 async function generatePDF() {
-  // Collect all form inputs
   const applicationDate = document.getElementById('applicationDate').value;
   const insuredNumber   = document.getElementById('insuredNumber').value;
   const myNumber        = document.getElementById('myNumber').value;
@@ -78,13 +73,12 @@ async function generatePDF() {
   const gender          = document.getElementById('gender').value;
   const address         = document.getElementById('address').value;
 
-  // Load blank_form.pdf
   const existingPdfBytes = await fetch('blank_form.pdf').then(res => res.arrayBuffer());
   const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
   const font   = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+  const page   = pdfDoc.getPages()[0];
 
-  // Draw text onto the first page (adjust x,y as needed)
-  const page = pdfDoc.getPages()[0];
+  // Draw text onto the first page (adjust x, y according to your PDF)
   page.drawText(applicationDate, { x: 50, y: 800, size: 12, font });
   page.drawText(insuredNumber,   { x: 50, y: 780, size: 12, font });
   page.drawText(myNumber,        { x: 50, y: 760, size: 12, font });
@@ -99,7 +93,6 @@ async function generatePDF() {
   page.drawText(gender,          { x: 150, y: 660, size: 12, font });
   page.drawText(address,         { x: 50, y: 640, size: 12, font });
 
-  // Save and trigger download
   const pdfBytes = await pdfDoc.save();
   saveAs(new Blob([pdfBytes], { type: 'application/pdf' }), '申請フォーム.pdf');
 }
