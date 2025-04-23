@@ -7,113 +7,129 @@
   <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   <style>
+    body { font-family: sans-serif; padding: 20px; }
     label { display: block; margin: 8px 0; }
     .inline > * { display: inline-block; margin-right: 8px; }
+    fieldset { margin: 12px 0; padding: 10px; }
+    legend { font-weight: bold; }
   </style>
 </head>
 <body>
   <h1>介護保険申請フォーム</h1>
   <form id="careForm">
-    <!-- 既存の項目省略 -->
-    
-    <!-- 要介護区分 -->
-    <label>要介護区分:
-      <select id="careLevel" required>
-        <option value="">--選択--</option>
-        <option>要支援1</option>
-        <option>要支援2</option>
-        <option>要介護1</option>
-        <option>要介護2</option>
-        <option>要介護3</option>
-        <option>要介護4</option>
-        <option>要介護5</option>
-      </select>
-    </label>
+    <!-- 申請年月日 -->
+    <label>申請年月日: <input type="date" id="applicationDate" required></label>
 
-    <!-- 有効期間 -->
+    <!-- 被保険者情報 -->
+    <fieldset>
+      <legend>被保険者情報</legend>
+      <label>介護保険被保険者番号: <input type="text" id="insuredNumber" required></label>
+      <label>マイナンバー: <input type="text" id="myNumber" required></label>
+      <label>（医療）保険者名: <input type="text" id="insurerName" required></label>
+      <label>保険者番号: <input type="text" id="insurerNumber" required></label>
+      <label>記号: <input type="text" id="medicalSymbol" required></label>
+      <label>番号: <input type="text" id="medicalNumber" required></label>
+      <label>枝番: <input type="text" id="medicalBranch" required></label>
+      <label>フリガナ: <input type="text" id="furigana" required></label>
+      <label class="inline">
+        生年月日（和暦）:
+        <select id="era" required><option value="">元号</option><option>明治</option><option>大正</option><option>昭和</option><option>平成</option><option>令和</option></select>
+        <select id="eraYear" required><option value="">年</option></select>
+        <select id="month" required><option value="">月</option></select>
+        <select id="day" required><option value="">日</option></select>
+      </label>
+      <label>氏名: <input type="text" id="name" required></label>
+      <label>性別:
+        <select id="gender" required><option value="">選択</option><option>男</option><option>女</option></select>
+      </label>
+      <label>住所: <input type="text" id="address" required></label>
+      <label>電話番号: <input type="text" id="phoneNumber" required></label>
+    </fieldset>
+
+    <!-- 要介護区分と有効期間 -->
+    <label>要介護区分:
+      <select id="careLevel" required><option value="">--選択--</option><option>要支援1</option><option>要支援2</option><option>要介護1</option><option>要介護2</option><option>要介護3</option><option>要介護4</option><option>要介護5</option></select>
+    </label>
     <label>有効期間:
       <span class="inline">
-        <select id="validEraStart" required> <!-- 元号プル -->
-          <option value="">--元号--</option>
-          <option>令和</option><option>平成</option>
-        </select>
-        <select id="validYearStart" required><option value="">--年--</option></select>
-        <select id="validMonthStart" required><option value="">--月--</option></select>
-        <select id="validDayStart" required><option value="">--日--</option></select>
-      </span>
-      ～
+        <select id="validEraStart" required><option value="">元号</option><option>令和</option><option>平成</option></select>
+        <select id="validYearStart" required><option value="">年</option></select>
+        <select id="validMonthStart" required><option value="">月</option></select>
+        <select id="validDayStart" required><option value="">日</option></select>
+      </span>～
       <span class="inline">
-        <select id="validEraEnd" required>
-          <option value="">--元号--</option>
-          <option>令和</option><option>平成</option>
-        </select>
-        <select id="validYearEnd" required><option value="">--年--</option></select>
-        <select id="validMonthEnd" required><option value="">--月--</option></select>
-        <select id="validDayEnd" required><option value="">--日--</option></select>
+        <select id="validEraEnd" required><option value="">元号</option><option>令和</option><option>平成</option></select>
+        <select id="validYearEnd" required><option value="">年</option></select>
+        <select id="validMonthEnd" required><option value="">月</option></select>
+        <select id="validDayEnd" required><option value="">日</option></select>
       </span>
     </label>
 
-    <!-- 過去6ヶ月入院・入所 -->
+    <!-- 過去6ヶ月の入院・入所 -->
     <fieldset>
       <legend>過去6ヶ月の入院・入所</legend>
-      <label>介護保険施設の名称等：<input type="text" id="facilityName"></label>
-      <label>期間：
+      <label>介護保険施設の名称: <input type="text" id="facilityName"></label>
+      <label>施設期間:
         <span class="inline">
-          <select id="fEraStart"><option>令和</option></select>
-          <select id="fYearStart"><option>--年--</option></select>
-          <select id="fMonthStart"><option>--月--</option></select>
-          <select id="fDayStart"><option>--日--</option></select>
-        </span>
-        ～
+          <select id="facilityEraStart"><option value="">元号</option></select>
+          <select id="facilityYearStart"><option value="">年</option></select>
+          <select id="facilityMonthStart"><option value="">月</option></select>
+          <select id="facilityDayStart"><option value="">日</option></select>
+        </span>～
         <span class="inline">
-          <select id="fEraEnd"><option>令和</option></select>
-          <select id="fYearEnd"><option>--年--</option></select>
-          <select id="fMonthEnd"><option>--月--</option></select>
-          <select id="fDayEnd"><option>--日--</option></select>
+          <select id="facilityEraEnd"><option value="">元号</option></select>
+          <select id="facilityYearEnd"><option value="">年</option></select>
+          <select id="facilityMonthEnd"><option value="">月</option></select>
+          <select id="facilityDayEnd"><option value="">日</option></select>
         </span>
       </label>
-      <label>医療機関等の名称等：<input type="text" id="medicalName"></label>
-      <label>期間：（同上スクリプトでIDをmedicalEraStart などに置換）</label>
+      <label>医療機関等の名称: <input type="text" id="medicalName"></label>
+      <label>医療期間:
+        <span class="inline">
+          <select id="medicalEraStart"><option value="">元号</option></select>
+          <select id="medicalYearStart"><option value="">年</option></select>
+          <select id="medicalMonthStart"><option value="">月</option></select>
+          <select id="medicalDayStart"><option value="">日</option></select>
+        </span>～
+        <span class="inline">
+          <select id="medicalEraEnd"><option value="">元号</option></select>
+          <select id="medicalYearEnd"><option value="">年</option></select>
+          <select id="medicalMonthEnd"><option value="">月</option></select>
+          <select id="medicalDayEnd"><option value="">日</option></select>
+        </span>
+      </label>
     </fieldset>
 
     <!-- 申請書提出者 -->
     <fieldset>
       <legend>申請書提出者</legend>
-      <label>代行事業所：
-        <select id="agentType">
-          <option value="">--選択--</option>
-          <option>指定居宅介護支援事業所</option>
-          <option>介護老人保健施設</option>
-          <option>介護医療院</option>
-          <option>地域包括支援センター</option>
-          <option>指定介護老人福祉施設</option>
-        </select>
+      <label>代行事業所:
+        <select id="agentType"><option value="">--選択--</option><option>指定居宅介護支援事業所</option><option>介護老人保健施設</option><option>介護医療院</option><option>地域包括支援センター</option><option>指定介護老人福祉施設</option></select>
       </label>
-      <label>名称：<input type="text" id="agentName"></label>
-      <label>所在地：<input type="text" id="agentAddress"></label>
-      <label>電話番号：<input type="text" id="agentTel"></label>
+      <label>名称: <input type="text" id="agentName"></label>
+      <label>所在地: <input type="text" id="agentAddress"></label>
+      <label>電話番号: <input type="text" id="agentTel"></label>
       <p>上記以外の場合</p>
-      <label>氏名・名称：<input type="text" id="agentOtherName"></label>
-      <label>本人との関係：<input type="text" id="relation"></label>
-      <label>住所：<input type="text" id="agentOtherAddress"></label>
-      <label>電話番号：<input type="text" id="agentOtherTel"></label>
+      <label>氏名/名称: <input type="text" id="agentOtherName"></label>
+      <label>本人との関係: <input type="text" id="relation"></label>
+      <label>住所: <input type="text" id="agentOtherAddress"></label>
+      <label>電話番号: <input type="text" id="agentOtherTel"></label>
     </fieldset>
 
     <!-- 主治医 -->
     <fieldset>
       <legend>主治医</legend>
-      <label>医師氏名：<input type="text" id="doctorName"></label>
-      <label>医療機関：<input type="text" id="doctorHospital"><button type="button" id="searchDoctor">検索</button></label>
-      <label>所在地：<input type="text" id="doctorAddress"></label>
-      <label>電話番号：<input type="text" id="doctorTel"></label>
+      <label>医師氏名: <input type="text" id="doctorName"></label>
+      <label>医療機関: <input type="text" id="doctorHospital"><button type="button" id="searchDoctor">検索</button></label>
+      <label>所在地: <input type="text" id="doctorAddress"></label>
+      <label>電話番号: <input type="text" id="doctorTel"></label>
     </fieldset>
 
-    <!-- 2号被保険者のみ -->
-    <label>特定疾病名（2号被保険者のみ）：<input type="text" id="diseaseName"></label>
+    <!-- 2号被保険者 -->
+    <label>特定疾病名（2号被保険者のみ）: <input type="text" id="diseaseName"></label>
 
     <button type="button" onclick="generatePDF()">PDF生成</button>
   </form>
-
   <script src="form.js"></script>
 </body>
 </html>
