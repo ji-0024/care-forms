@@ -1,24 +1,35 @@
 async function generatePDF() {
-  // 1. フォームの入力値を取得
-  const name = document.getElementById('name').value;
-  const dob  = document.getElementById('dob').value;
+  // すべての入力値を取得
+  const applicationDate = document.getElementById('applicationDate').value;
+  const insuredNumber   = document.getElementById('insuredNumber').value;
+  const myNumber        = document.getElementById('myNumber').value;
+  const insurerName     = document.getElementById('insurerName').value;
+  const insurerNumber   = document.getElementById('insurerNumber').value;
+  const medicalSymbol   = document.getElementById('medicalSymbol').value;
+  const medicalNumber   = document.getElementById('medicalNumber').value;
+  const medicalBranch   = document.getElementById('medicalBranch').value;
+  const furigana        = document.getElementById('furigana').value;
+  const name            = document.getElementById('name').value;
+  const dob             = document.getElementById('dob').value;
+  const gender          = document.getElementById('gender').value;
+  const address         = document.getElementById('address').value;
 
-  // 2. 空白PDFを読み込む
-  const existingPdfBytes = await fetch('blank_form.pdf').then(res => res.arrayBuffer());
+  // テスト用にコンソールへ出力
+  console.log({
+    applicationDate,
+    insuredNumber,
+    myNumber,
+    insurerName,
+    insurerNumber,
+    medicalSymbol,
+    medicalNumber,
+    medicalBranch,
+    furigana,
+    name,
+    dob,
+    gender,
+    address
+  });
 
-  // 3. PDF-LIB でドキュメントを読み込み
-  const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
-
-  // 4. フォントを埋め込む（標準フォント）
-  const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
-
-  // 5. 1ページ目を取得してテキストを描画
-  const page = pdfDoc.getPages()[0];
-  // ※ x, y は適宜調整してください
-  page.drawText(name, { x: 100, y: 700, size: 12, font });
-  page.drawText(dob,  { x: 100, y: 680, size: 12, font });
-
-  // 6. 新しいPDFを生成し、ダウンロード
-  const pdfBytes = await pdfDoc.save();
-  saveAs(new Blob([pdfBytes], { type: 'application/pdf' }), '申請フォーム.pdf');
+  // 将来的にここでPDF生成処理を呼び出します
 }
