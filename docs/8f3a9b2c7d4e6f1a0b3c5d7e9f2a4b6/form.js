@@ -1,50 +1,56 @@
 // form.js
 
-// 和暦元号から西暦を計算するマップ
+// Map Japanese era names to base years for conversion
 const eraMap = {
   '令和': 2018,
   '平成': 1988,
   '昭和': 1925,
-  // 必要に応じて '大正': 1911 などを追加
+  // '大正': 1911, // add if needed
 };
 
-// ページ読み込み時に select 要素を初期化
+// Initialize dropdowns when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
-  const eraYear = document.getElementById('eraYear');
-  const month   = document.getElementById('month');
-  const day     = document.getElementById('day');
+  const eraSelect  = document.getElementById('era');
+  const eraYearSel = document.getElementById('eraYear');
+  const monthSel   = document.getElementById('month');
+  const daySel     = document.getElementById('day');
 
-  // 元号年：1年～31年
-  for (let y = 1; y <= 31; y++) {
-    eraYear.add(new Option(`${y}年`, y));
-  }
-  // 月：1月～12月
+  // Populate months (1-12)
   for (let m = 1; m <= 12; m++) {
-    month.add(new Option(`${m}月`, m));
+    monthSel.add(new Option(`${m}月`, m));
   }
-  // 日：1日～31日
+  // Populate days (1-31)
   for (let d = 1; d <= 31; d++) {
-    day.add(new Option(`${d}日`, d));
+    daySel.add(new Option(`${d}日`, d));
   }
+
+  // When era changes, regenerate year options with era label
+  eraSelect.addEventListener('change', () => {
+    const era = eraSelect.value;
+    eraYearSel.innerHTML = '<option value="">--年--</option>';
+    if (!eraMap[era]) return;
+    for (let y = 1; y <= 31; y++) {
+      const label = `${era}${y}年`;
+      eraYearSel.add(new Option(label, y));
+    }
+  });
 });
 
-// 和暦入力をISO形式（YYYY-MM-DD）に変換
+// Convert Japanese era selection to ISO date string
 function getBirthDateISO() {
-  const e = document.getElementById('era').value;
-  const y = parseInt(document.getElementById('eraYear').value);
-  const m = String(document.getElementById('month').value).padStart(2, '0');
-  const d = String(document.getElementById('day').value).padStart(2, '0');
+  const era  = document.getElementById('era').value;
+  const y    = parseInt(document.getElementById('eraYear').value);
+  const m    = String(document.getElementById('month').value).padStart(2, '0');
+  const d    = String(document.getElementById('day').value).padStart(2, '0');
 
-  if (!eraMap[e] || isNaN(y)) {
-    return '';
-  }
-  const year = eraMap[e] + y;
+  if (!eraMap[era] || isNaN(y)) return '';
+  const year = eraMap[era] + y;
   return `${year}-${m}-${d}`;
 }
 
-// PDF生成関数
+// Main function to generate and download PDF
 async function generatePDF() {
-  // フォームの全入力値を取得
+  // Collect all form inputs
   const applicationDate = document.getElementById('applicationDate').value;
   const insuredNumber   = document.getElementById('insuredNumber').value;
   const myNumber        = document.getElementById('myNumber').value;
@@ -59,13 +65,14 @@ async function generatePDF() {
   const gender          = document.getElementById('gender').value;
   const address         = document.getElementById('address').value;
 
-  // 元PDFをロード
+  // Load the blank PDF template
   const existingPdfBytes = await fetch('blank_form.pdf').then(res => res.arrayBuffer());
   const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
   const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
 
+  // Draw text onto the first page
   const page = pdfDoc.getPages()[0];
-  // 以下のx,y座標はPDFフォーマットに合わせて調整してください
+  // TODO: Adjust x, y coordinates to align with your PDF layout
   page.drawText(applicationDate, { x: 50, y: 800, size: 12, font });
   page.drawText(insuredNumber,   { x: 50, y: 780, size: 12, font });
   page.drawText(myNumber,        { x: 50, y: 760, size: 12, font });
@@ -80,7 +87,7 @@ async function generatePDF() {
   page.drawText(gender,          { x: 150, y: 660, size: 12, font });
   page.drawText(address,         { x: 50, y: 640, size: 12, font });
 
-  // PDF出力＆ダウンロード
+  // Save and trigger download
   const pdfBytes = await pdfDoc.save();
   saveAs(new Blob([pdfBytes], { type: 'application/pdf' }), '申請フォーム.pdf');
 }
