@@ -8,11 +8,13 @@
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   <style>
     body { font-family: sans-serif; padding: 20px; }
-    fieldset { margin: 16px 0; padding: 12px; }
+    fieldset { margin: 16px 0; padding: 12px; border: 1px solid #ccc; border-radius: 4px; }
     legend { font-weight: bold; }
-    .inline { display: flex; flex-wrap: wrap; gap: 8px; }
-    label { margin-right: 4px; }
-    select, input { margin-right: 16px; }
+    .inline { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    label { margin-right: 4px; white-space: nowrap; }
+    input, select { margin-right: 16px; padding: 4px 8px; border: 1px solid #aaa; border-radius: 4px; }
+    button { margin-top: 12px; padding: 8px 16px; border: none; background: #007acc; color: white; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #005fa3; }
   </style>
 </head>
 <body>
@@ -20,174 +22,151 @@
   <form id="careForm">
     <!-- 申請年月日 -->
     <label for="applicationDate">申請年月日</label>
-    <input type="date" id="applicationDate" autocomplete="bday" required><br>
+    <input type="date" id="applicationDate" required><br>
 
     <!-- 被保険者情報 -->
     <fieldset>
       <legend>被保険者情報</legend>
       <div class="inline">
         <label for="insuredNumber">介護保険被保険者番号</label>
-        <input type="text" id="insuredNumber" autocomplete="off" required>
+        <input type="text" id="insuredNumber" required>
         <label for="myNumber">マイナンバー</label>
-        <input type="text" id="myNumber" autocomplete="off" required>
+        <input type="text" id="myNumber" required>
       </div>
       <div class="inline">
         <label for="insurerName">（医療）保険者名</label>
-        <input type="text" id="insurerName" autocomplete="off" required>
+        <input type="text" id="insurerName" required>
         <label for="insurerNumber">保険者番号</label>
-        <input type="text" id="insurerNumber" autocomplete="off" required>
+        <input type="text" id="insurerNumber" required>
       </div>
       <div class="inline">
         <label for="medicalSymbol">記号</label>
-        <input type="text" id="medicalSymbol" autocomplete="off" required>
+        <input type="text" id="medicalSymbol" required>
         <label for="medicalNumber">番号</label>
-        <input type="text" id="medicalNumber" autocomplete="off" required>
+        <input type="text" id="medicalNumber" required>
         <label for="medicalBranch">枝番</label>
-        <input type="text" id="medicalBranch" autocomplete="off" required>
+        <input type="text" id="medicalBranch" required>
       </div>
       <div class="inline">
         <label for="furigana">フリガナ</label>
-        <input type="text" id="furigana" autocomplete="off" required>
+        <input type="text" id="furigana" required>
       </div>
       <div class="inline">
-        <label for="era">元号</label>
-        <select id="era" autocomplete="bday-era" required>
-          <option value="">元号</option>
-          <option>明治</option><option>大正</option><option>昭和</option><option>平成</option><option>令和</option>
+        <label>生年月日</label>
+        <select id="eraYear" required>
+          <option value="">年</option>
+          <!-- 年プルダウンは JavaScript で 1〜99 を追加 -->
         </select>
-        <label for="eraYear">年</label>
-        <select id="eraYear" autocomplete="bday-year" required><option value="">年</option></select>
-        <label for="month">月</label>
-        <select id="month" autocomplete="bday-month" required><option value="">月</option></select>
-        <label for="day">日</label>
-        <select id="day" autocomplete="bday-day" required><option value="">日</option></select>
-      </div>
+        <select id="month" required>
+          <option value="">月</option>
+          <!-- 月プルダウンは JavaScript で 1〜12 を追加 -->
+        </select>
+        <select id="day" required>
+          <option value="">日</option>
+          <!-- 日プルダウンは JavaScript で 1〜31 を追加 -->
+        </select>
+      </div>      
       <div class="inline">
         <label for="name">氏名</label>
-        <input type="text" id="name" autocomplete="name" required>
+        <input type="text" id="name" required>
         <label for="gender">性別</label>
-        <select id="gender" autocomplete="sex" required><option value="">選択</option><option>男</option><option>女</option></select>
+        <select id="gender" required><option value="">選択</option><option>男</option><option>女</option></select>
       </div>
       <div class="inline">
         <label for="address">住所</label>
-        <input type="text" id="address" autocomplete="street-address" required>
+        <input type="text" id="address" required>
         <label for="phoneNumber">電話番号</label>
-        <input type="tel" id="phoneNumber" autocomplete="tel" required>
+        <input type="tel" id="phoneNumber" required>
       </div>
     </fieldset>
 
-    <!-- 要介護区分 & 有効期間 -->
+    <!-- サービス等の情報 -->
     <fieldset>
       <legend>サービス等の情報</legend>
       <div class="inline">
         <label for="careLevel">要介護区分</label>
-        <select id="careLevel" autocomplete="off" required>
-          <option value="">選択</option>
-          <option>要支援1</option><option>要支援2</option>
-          <option>要介護1</option><option>要介護2</option>
-          <option>要介護3</option><option>要介護4</option>
-          <option>要介護5</option>
-        </select>
+        <select id="careLevel" required><option value="">選択</option><option>要支援1</option><option>要支援2</option><option>要介護1</option><option>要介護2</option><option>要介護3</option><option>要介護4</option><option>要介護5</option></select>
       </div>
       <div class="inline">
-        <label for="validEraStart">有効期間開始</label>
-        <select id="validEraStart" autocomplete="off" required><option value="">元号</option><option>令和</option><option>平成</option></select>
-        <label for="validYearStart">年</label>
-        <select id="validYearStart" autocomplete="off" required><option value="">年</option></select>
-        <label for="validMonthStart">月</label>
-        <select id="validMonthStart" autocomplete="off" required><option value="">月</option></select>
-        <label for="validDayStart">日</label>
-        <select id="validDayStart" autocomplete="off" required><option value="">日</option></select>
-        <span>～</span>
-        <label for="validEraEnd">有効期間終了</label>
-        <select id="validEraEnd" autocomplete="off" required><option value="">元号</option><option>令和</option><option>平成</option></select>
-        <label for="validYearEnd">年</label>
-        <select id="validYearEnd" autocomplete="off" required><option value="">年</option></select>
-        <label for="validMonthEnd">月</label>
-        <select id="validMonthEnd" autocomplete="off" required><option value="">月</option></select>
-        <label for="validDayEnd">日</label>
-        <select id="validDayEnd" autocomplete="off" required><option value="">日</option></select>
+        <label>有効期間</label>
+        <select id="validEraStart" required><option value="">元号</option></select>
+        <select id="validYearStart" required><option value="">年</option></select>
+        <select id="validMonthStart" required><option value="">月</option></select>
+        <select id="validDayStart" required><option value="">日</option></select>
+        ～
+        <select id="validEraEnd" required><option value="">元号</option></select>
+        <select id="validYearEnd" required><option value="">年</option></select>
+        <select id="validMonthEnd" required><option value="">月</option></select>
+        <select id="validDayEnd" required><option value="">日</option></select>
       </div>
     </fieldset>
 
-    <!-- 過去6ヶ月 -->
-    <fieldset>
-      <legend>過去6ヶ月の入院・入所</legend>
-      <div class="inline">
-        <label for="facilityName">施設名</label>
-        <input type="text" id="facilityName" autocomplete="off">
-      </div>
-      <div class="inline">
-        <label for="facilityEraStart">開始</label>
-        <select id="facilityEraStart" autocomplete="off"></select>
-        <label for="facilityYearStart">年</label>
-        <select id="facilityYearStart" autocomplete="off"></select>
-        <label for="facilityMonthStart">月</label>
-        <select id="facilityMonthStart" autocomplete="off"></select>
-        <label for="facilityDayStart">日</label>
-        <select id="facilityDayStart" autocomplete="off"></select>
-        <span>～</span>
-        <label for="facilityEraEnd">終了</label>
-        <select id="facilityEraEnd" autocomplete="off"></select>
-        <label for="facilityYearEnd">年</label>
-        <select id="facilityYearEnd" autocomplete="off"></select>
-        <label for="facilityMonthEnd">月</label>
-        <select id="facilityMonthEnd" autocomplete="off"></select>
-        <label for="facilityDayEnd">日</label>
-        <select id="facilityDayEnd" autocomplete="off"></select>
-      </div>
-      <div class="inline">
-        <label for="medicalName">医療機関名</label>
-        <input type="text" id="medicalName" autocomplete="off">
-      </div>
-      <div class="inline">
-        <label for="medicalEraStart">開始</label>
-        <select id="medicalEraStart" autocomplete="off"></select>
-        <label for="medicalYearStart">年</label>
-        <select id="medicalYearStart" autocomplete="off"></select>
-        <label for="medicalMonthStart">月</label>
-        <select id="medicalMonthStart" autocomplete="off"></select>
-        <label for="medicalDayStart">日</label>
-        <select id="medicalDayStart" autocomplete="off"></select>
-        <span>～</span>
-        <label for="medicalEraEnd">終了</label>
-        <select id="medicalEraEnd" autocomplete="off"></select>
-        <label for="medicalYearEnd">年</label>
-        <select id="medicalYearEnd" autocomplete="off"></select>
-        <label for="medicalMonthEnd">月</label>
-        <select id="medicalMonthEnd" autocomplete="off"></select>
-        <label for="medicalDayEnd">日</label>
-        <select id="medicalDayEnd" autocomplete="off"></select>
-      </div>
-    </fieldset>
+    <!-- 過去6ヶ月の入院・入所 -->
+<fieldset>
+  <legend>過去6ヶ月の入院・入所</legend>
+  <div class="inline">
+    <label for="facilityName">施設名</label>
+    <input type="text" id="facilityName">
+  </div>
+  <div class="inline">
+    <label>施設期間</label>
+    <select id="facilityEraStart"><option value="">元号</option></select>
+    <select id="facilityYearStart"><option value="">年</option></select>
+    <select id="facilityMonthStart"><option value="">月</option></select>
+    <select id="facilityDayStart"><option value="">日</option></select>
+    ～ 
+    <select id="facilityEraEnd"><option value="">元号</option></select>
+    <select id="facilityYearEnd"><option value="">年</option></select>
+    <select id="facilityMonthEnd"><option value="">月</option></select>
+    <select id="facilityDayEnd"><option value="">日</option></select>
+  </div>
+  <div class="inline">
+    <label for="medicalName">医療機関名</label>
+    <input type="text" id="medicalName">
+  </div>
+  <div class="inline">
+    <label>医療期間</label>
+    <select id="medicalEraStart"><option value="">元号</option></select>
+    <select id="medicalYearStart"><option value="">年</option></select>
+    <select id="medicalMonthStart"><option value="">月</option></select>
+    <select id="medicalDayStart"><option value="">日</option></select>
+    ～ 
+    <select id="medicalEraEnd"><option value="">元号</option></select>
+    <select id="medicalYearEnd"><option value="">年</option></select>
+    <select id="medicalMonthEnd"><option value="">月</option></select>
+    <select id="medicalDayEnd"><option value="">日</option></select>
+  </div>
+</fieldset>
 
-    <!-- 提出者 -->
+
+
+    <!-- 申請書提出者 -->
     <fieldset>
       <legend>申請書提出者</legend>
       <div class="inline">
         <label for="agentType">種別</label>
-        <select id="agentType" autocomplete="off"><option>--選択--</option><option>指定居宅介護支援事業所</option><option>介護老人保健施設</option><option>介護医療院</option><option>地域包括支援センター</option><option>指定介護老人福祉施設</option></select>
+        <select id="agentType"><option value="">--選択--</option><option>指定居宅介護支援事業所</option><option>介護老人保健施設</option><option>介護医療院</option><option>地域包括支援センター</option><option>指定介護老人福祉施設</option></select>
       </div>
       <div class="inline">
         <label for="agentName">名称</label>
-        <input type="text" id="agentName" autocomplete="off">
+        <input type="text" id="agentName">
         <label for="agentAddress">所在地</label>
-        <input type="text" id="agentAddress" autocomplete="off">
+        <input type="text" id="agentAddress">
         <label for="agentTel">電話番号</label>
-        <input type="tel" id="agentTel" autocomplete="tel">
+        <input type="tel" id="agentTel">
       </div>
       <p>上記以外の場合</p>
       <div class="inline">
         <label for="agentOtherName">氏名/名称</label>
-        <input type="text" id="agentOtherName" autocomplete="off">
+        <input type="text" id="agentOtherName">
         <label for="relation">本人との関係</label>
-        <input type="text" id="relation" autocomplete="off">
+        <input type="text" id="relation">
       </div>
       <div class="inline">
         <label for="agentOtherAddress">住所</label>
-        <input type="text" id="agentOtherAddress" autocomplete="street-address">
+        <input type="text" id="agentOtherAddress">
         <label for="agentOtherTel">電話番号</label>
-        <input type="tel" id="agentOtherTel" autocomplete="tel">
+        <input type="tel" id="agentOtherTel">
       </div>
     </fieldset>
 
@@ -196,25 +175,117 @@
       <legend>主治医</legend>
       <div class="inline">
         <label for="doctorName">医師氏名</label>
-        <input type="text" id="doctorName" autocomplete="name">
+        <input type="text" id="doctorName">
         <label for="doctorHospital">医療機関</label>
-        <input type="text" id="doctorHospital" autocomplete="off">
-        <button type="button" id="searchDoctor">検索</button>
+        <input type="text" id="doctorHospital">
       </div>
       <div class="inline">
         <label for="doctorAddress">所在地</label>
-        <input type="text" id="doctorAddress" autocomplete="street-address">
+        <input type="text" id="doctorAddress">
         <label for="doctorTel">電話番号</label>
-        <input type="tel" id="doctorTel" autocomplete="tel">
+        <input type="tel" id="doctorTel">
       </div>
     </fieldset>
 
     <!-- 2号被保険者 -->
     <label for="diseaseName">特定疾病名（2号被保険者のみ）</label>
-    <input type="text" id="diseaseName" autocomplete="off"><br>
+    <input type="text" id="diseaseName"><br>
 
-    <button type="button" onclick="generatePDF()">PDF生成</button>
+    <button type="button">PDF生成</button>
   </form>
-  <script src="form.js"></script>
+
+  <script>
+    const eraMap = { 明治:1868, 大正:1912, 昭和:1926, 平成:1989, 令和:2019 };
+    function initDropdown(eraId, yearId, monthId, dayId) {
+      const eraSel   = document.getElementById(eraId);
+      const yearSel  = document.getElementById(yearId);
+      const monthSel = document.getElementById(monthId);
+      const daySel   = document.getElementById(dayId);
+      if (eraSel) Object.keys(eraMap).forEach(e => eraSel.add(new Option(e, e)));
+      if (yearSel) for (let y = 1; y <= 99; y++) yearSel.add(new Option(`${y}年`, y));
+      if (monthSel) for (let m = 1; m <= 12; m++) monthSel.add(new Option(`${m}月`, m));
+      if (daySel) for (let d = 1; d <= 31; d++) daySel.add(new Option(`${d}日`, d));
+    }
+
+    function getISO(eraId, yearId, monthId, dayId) {
+      const era = document.getElementById(eraId)?.value;
+      const y   = parseInt(document.getElementById(yearId)?.value, 10);
+      const m   = String(document.getElementById(monthId)?.value).padStart(2, '0');
+      const d   = String(document.getElementById(dayId)?.value).padStart(2, '0');
+      if (!eraMap[era] || isNaN(y)) return '';
+      return `${eraMap[era] + y - 1}-${m}-${d}`;
+    }
+
+    async function generatePDF() {
+      const data = {
+        applicationDate: document.getElementById('applicationDate').value,
+        insuredNumber:   document.getElementById('insuredNumber').value,
+        myNumber:        document.getElementById('myNumber').value,
+        insurerName:     document.getElementById('insurerName').value,
+        insurerNumber:   document.getElementById('insurerNumber').value,
+        medicalSymbol:   document.getElementById('medicalSymbol').value,
+        medicalNumber:   document.getElementById('medicalNumber').value,
+        medicalBranch:   document.getElementById('medicalBranch').value,
+        furigana:        document.getElementById('furigana').value,
+        name:            document.getElementById('name').value,
+        dob:             getISO('era', 'eraYear', 'month', 'day'),
+        gender:          document.getElementById('gender').value,
+        address:         document.getElementById('address').value,
+        phoneNumber:     document.getElementById('phoneNumber').value,
+        careLevel:       document.getElementById('careLevel').value,
+        validStart:      getISO('validEraStart', 'validYearStart', 'validMonthStart', 'validDayStart'),
+        validEnd:        getISO('validEraEnd', 'validYearEnd', 'validMonthEnd', 'validDayEnd'),
+        facilityName:    document.getElementById('facilityName').value,
+        facilityStart:   getISO('facilityEraStart', 'facilityYearStart', 'facilityMonthStart', 'facilityDayStart'),
+        facilityEnd:     getISO('facilityEraEnd', 'facilityYearEnd', 'facilityMonthEnd', 'facilityDayEnd'),
+        medicalName:     document.getElementById('medicalName').value,
+        medicalStart:    getISO('medicalEraStart', 'medicalYearStart', 'medicalMonthStart', 'medicalDayStart'),
+        medicalEnd:      getISO('medicalEraEnd', 'medicalYearEnd', 'medicalMonthEnd', 'medicalDayEnd'),
+        agentType:       document.getElementById('agentType').value,
+        agentName:       document.getElementById('agentName').value,
+        agentAddress:    document.getElementById('agentAddress').value,
+        agentTel:        document.getElementById('agentTel').value,
+        agentOtherName:  document.getElementById('agentOtherName').value,
+        relation:        document.getElementById('relation').value,
+        agentOtherAddress: document.getElementById('agentOtherAddress').value,
+        agentOtherTel:   document.getElementById('agentOtherTel').value,
+        doctorName:      document.getElementById('doctorName').value,
+        doctorHospital:  document.getElementById('doctorHospital').value,
+        doctorAddress:   document.getElementById('doctorAddress').value,
+        doctorTel:       document.getElementById('doctorTel').value,
+        diseaseName:     document.getElementById('diseaseName').value
+      };
+      const { PDFDocument, StandardFonts } = PDFLib;
+      const pdfDoc = await PDFDocument.create();
+      let page = pdfDoc.addPage([595.28, 841.89]);
+      const font = await pdfDoc.embedFont(StandardFonts.HELVETICA);
+      const fontSize = 12;
+      let x = 40;
+      let y = page.getHeight() - 50;
+
+      Object.entries(data).forEach(([key, value]) => {
+        const labelEl = document.querySelector(`label[for="${key}"]`);
+        const text = (labelEl ? labelEl.textContent : key) + '：' + (value || '');
+        page.drawText(text, { x, y, size: fontSize, font });
+        y -= fontSize + 6;
+        if (y < 50) {
+          page = pdfDoc.addPage([595.28, 841.89]);
+          y = page.getHeight() - 50;
+        }
+      });
+
+      const pdfBytes = await pdfDoc.save();
+      saveAs(new Blob([pdfBytes], { type: 'application/pdf' }), 'kaigo_shinsei.pdf');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // ドロップダウン初期化
+      ['era','validEraStart','validEraEnd','facilityEraStart','facilityEraEnd','medicalEraStart','medicalEraEnd'].forEach(id => {
+        initDropdown(id, id.replace(/Era/, 'Year'), id.replace(/EraStart|EraEnd/, 'Month'), id.replace(/EraStart|EraEnd/, 'Day'));
+      });
+      // PDF生成ボタン
+      document.querySelector('button[type="button"]').addEventListener('click', generatePDF);
+    });
+  </script>
 </body>
 </html>
