@@ -1,101 +1,63 @@
-// form.js
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Prevent Chrome translate plugin from injecting scripts -->
+  <meta name="google" content="notranslate">
+  <title>介護保険申請フォーム</title>
+  <!-- PDF-LIB: 既存PDFを読み込んでテキストを重ねるライブラリ -->
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <!-- FileSaver.js: ブラウザで生成データをファイル保存するライブラリ -->
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+</head>
+<body>
+  <h1>介護保険申請フォーム</h1>
+  <p>以下の項目をご入力のうえ、「PDF生成」ボタンを押してください。</p>
 
-// Map Japanese era names to base years for conversion
-const eraMap = {
-  '明治': 1868,  // Meiji 1 begins 1868
-  '大正': 1912,  // Taisho 1 begins 1912
-  '昭和': 1926,  // Showa 1 begins 1926
-  '平成': 1989,  // Heisei 1 begins 1989
-  '令和': 2019   // Reiwa 1 begins 2019
-};
+  <form id="careForm">
+    <label>申請年月日：<input type="date" id="applicationDate" required></label><br>
+    <label>介護保険被保険者番号：<input type="text" id="insuredNumber" required></label><br>
+    <label>マイナンバー：<input type="text" id="myNumber" required></label><br>
+    <label>（医療保険）保険者名：<input type="text" id="insurerName" required></label><br>
+    <label>（医療保険）保険者番号：<input type="text" id="insurerNumber" required></label><br>
+    <label>（医療保険）記号：<input type="text" id="medicalSymbol" required></label><br>
+    <label>（医療保険）番号：<input type="text" id="medicalNumber" required></label><br>
+    <label>（医療保険）枝番：<input type="text" id="medicalBranch" required></label><br>
+    <label>フリガナ：<input type="text" id="furigana" required></label><br>
+    <label>氏名：<input type="text" id="name" required></label><br>
 
-// Initialize dropdowns when DOM is ready
-window.addEventListener('DOMContentLoaded', () => {
-  const eraSelect   = document.getElementById('era');
-  const eraYearSel  = document.getElementById('eraYear');
-  const monthSel    = document.getElementById('month');
-  const daySel      = document.getElementById('day');
+    <!-- 生年月日（和暦）：元号・年・月・日のプルダウンを同一行に表示 -->
+    <label>生年月日（和暦）：
+      <select id="era" required>
+        <option value="">--元号--</option>
+        <option value="明治">明治</option>
+        <option value="大正">大正</option>
+        <option value="昭和">昭和</option>
+        <option value="平成">平成</option>
+        <option value="令和">令和</option>
+      </select>
+      <select id="eraYear" required>
+        <option value="">--年--</option>
+      </select>
+      <select id="month" required>
+        <option value="">--月--</option>
+      </select>
+      <select id="day" required>
+        <option value="">--日--</option>
+      </select>
+    </label><br>
 
-  // Populate era options
-  ['明治', '大正', '昭和', '平成', '令和'].forEach(era => {
-    eraSelect.add(new Option(era, era));
-  });
+    <label>性別：<select id="gender" required>
+        <option value="">選択してください</option>
+        <option value="男">男</option>
+        <option value="女">女</option>
+      </select>
+    </label><br>
+    <label>住所：<input type="text" id="address" required></label><br>
+    <button type="button" onclick="generatePDF()">PDF生成</button>
+  </form>
 
-  // Populate month options (1-12)
-  for (let m = 1; m <= 12; m++) {
-    monthSel.add(new Option(`${m}月`, m));
-  }
-
-  // Populate day options (1-31)
-  for (let d = 1; d <= 31; d++) {
-    daySel.add(new Option(`${d}日`, d));
-  }
-
-  // When era changes, regenerate year options based on current year
-  eraSelect.addEventListener('change', () => {
-    const era = eraSelect.value;
-    eraYearSel.innerHTML = '<option value="">--年--</option>';
-    if (!eraMap[era]) return;
-    const currentYear = new Date().getFullYear();
-    const maxYear = currentYear - eraMap[era] + 1;
-    for (let y = 1; y <= maxYear; y++) {
-      eraYearSel.add(new Option(`${y}年`, y));
-    }
-  });
-});
-
-// Function to convert Japanese era selection to ISO date string
-function getBirthDateISO() {
-  const era = document.getElementById('era').value;
-  const y   = parseInt(document.getElementById('eraYear').value);
-  const m   = String(document.getElementById('month').value).padStart(2, '0');
-  const d   = String(document.getElementById('day').value).padStart(2, '0');
-
-  if (!eraMap[era] || isNaN(y)) return '';
-  const year = eraMap[era] + y - 1;
-  return `${year}-${m}-${d}`;
-}
-
-// Main function to generate and download PDF
-async function generatePDF() {
-  // Collect all form inputs
-  const applicationDate = document.getElementById('applicationDate').value;
-  const insuredNumber   = document.getElementById('insuredNumber').value;
-  const myNumber        = document.getElementById('myNumber').value;
-  const insurerName     = document.getElementById('insurerName').value;
-  const insurerNumber   = document.getElementById('insurerNumber').value;
-  const medicalSymbol   = document.getElementById('medicalSymbol').value;
-  const medicalNumber   = document.getElementById('medicalNumber').value;
-  const medicalBranch   = document.getElementById('medicalBranch').value;
-  const furigana        = document.getElementById('furigana').value;
-  const name            = document.getElementById('name').value;
-  const dob             = getBirthDateISO();
-  const gender          = document.getElementById('gender').value;
-  const address         = document.getElementById('address').value;
-
-  // Load blank_form.pdf
-  const existingPdfBytes = await fetch('blank_form.pdf').then(res => res.arrayBuffer());
-  const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
-  const font   = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
-
-  // Draw text onto the first page
-  const page = pdfDoc.getPages()[0];
-  // TODO: Adjust x, y coordinates to align with your PDF layout
-  page.drawText(applicationDate, { x: 50, y: 800, size: 12, font });
-  page.drawText(insuredNumber,   { x: 50, y: 780, size: 12, font });
-  page.drawText(myNumber,        { x: 50, y: 760, size: 12, font });
-  page.drawText(insurerName,     { x: 50, y: 740, size: 12, font });
-  page.drawText(insurerNumber,   { x: 50, y: 720, size: 12, font });
-  page.drawText(medicalSymbol,   { x: 50, y: 700, size: 12, font });
-  page.drawText(medicalNumber,   { x: 150, y: 700, size: 12, font });
-  page.drawText(medicalBranch,   { x: 250, y: 700, size: 12, font });
-  page.drawText(furigana,        { x: 50, y: 680, size: 12, font });
-  page.drawText(name,            { x: 150, y: 680, size: 12, font });
-  page.drawText(dob,             { x: 50, y: 660, size: 12, font });
-  page.drawText(gender,          { x: 150, y: 660, size: 12, font });
-  page.drawText(address,         { x: 50, y: 640, size: 12, font });
-
-  // Save and trigger download
-  const pdfBytes = await pdfDoc.save();
-  saveAs(new Blob([pdfBytes], { type: 'application/pdf' }), '申請フォーム.pdf');
-}
+  <!-- form.js を最後に読み込む -->
+  <script src="form.js"></script>
+</body>
+</html>
