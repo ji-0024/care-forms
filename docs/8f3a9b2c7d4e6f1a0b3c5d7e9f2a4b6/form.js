@@ -1,15 +1,30 @@
 // form.js
 
-// Initialize dropdowns for Japanese era, month, and day
+// Map Japanese era names to base years for conversion
+const eraMap = {
+  '明治': 1868,
+  '大正': 1912,
+  '昭和': 1926,
+  '平成': 1989,
+  '令和': 2019
+};
+
+// Initialize dropdowns when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
-  const eraSelect = document.getElementById('era');
-  const monthSel  = document.getElementById('month');
-  const daySel    = document.getElementById('day');
+  const eraSelect   = document.getElementById('era');
+  const eraYearSel  = document.getElementById('eraYear');
+  const monthSel    = document.getElementById('month');
+  const daySel      = document.getElementById('day');
 
   // Populate era options
-  ['明治', '大正', '昭和', '平成', '令和'].forEach(era => {
-    eraSelect.add(new Option(era, era));
+  ['明治', '大正', '昭和', '平成', '令和'].forEach(e => {
+    eraSelect.add(new Option(e, e));
   });
+
+  // Populate year options (1-99)
+  for (let y = 1; y <= 99; y++) {
+    eraYearSel.add(new Option(`${y}年`, y));
+  }
 
   // Populate month options (1-12)
   for (let m = 1; m <= 12; m++) {
@@ -22,9 +37,20 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// Convert Japanese era + year + month + day to ISO date string
+function getBirthDateISO() {
+  const era = document.getElementById('era').value;
+  const y   = parseInt(document.getElementById('eraYear').value, 10);
+  const m   = String(document.getElementById('month').value).padStart(2, '0');
+  const d   = String(document.getElementById('day').value).padStart(2, '0');
+
+  if (!eraMap[era] || isNaN(y)) return '';
+  const year = eraMap[era] + y - 1;
+  return `${year}-${m}-${d}`;
+}
+
 // Main function to generate and download PDF
 async function generatePDF() {
-  // Collect all form inputs
   const applicationDate = document.getElementById('applicationDate').value;
   const insuredNumber   = document.getElementById('insuredNumber').value;
   const myNumber        = document.getElementById('myNumber').value;
@@ -35,9 +61,7 @@ async function generatePDF() {
   const medicalBranch   = document.getElementById('medicalBranch').value;
   const furigana        = document.getElementById('furigana').value;
   const name            = document.getElementById('name').value;
-  const era             = document.getElementById('era').value;
-  const month           = document.getElementById('month').value;
-  const day             = document.getElementById('day').value;
+  const dob             = getBirthDateISO();
   const gender          = document.getElementById('gender').value;
   const address         = document.getElementById('address').value;
 
@@ -45,10 +69,9 @@ async function generatePDF() {
   const existingPdfBytes = await fetch('blank_form.pdf').then(res => res.arrayBuffer());
   const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
   const font   = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
+  const page   = pdfDoc.getPages()[0];
 
-  // Draw text onto the first page
-  const page = pdfDoc.getPages()[0];
-  // Adjust x,y coordinates to match PDF layout
+  // Draw text onto the first page (adjust x,y according to your PDF)
   page.drawText(applicationDate, { x: 50, y: 800, size: 12, font });
   page.drawText(insuredNumber,   { x: 50, y: 780, size: 12, font });
   page.drawText(myNumber,        { x: 50, y: 760, size: 12, font });
@@ -59,13 +82,10 @@ async function generatePDF() {
   page.drawText(medicalBranch,   { x: 250, y: 700, size: 12, font });
   page.drawText(furigana,        { x: 50, y: 680, size: 12, font });
   page.drawText(name,            { x: 150, y: 680, size: 12, font });
-  page.drawText(era,             { x: 50, y: 660, size: 12, font });
-  page.drawText(`${month}月`,     { x: 100, y: 660, size: 12, font });
-  page.drawText(`${day}日`,       { x: 150, y: 660, size: 12, font });
-  page.drawText(gender,          { x: 200, y: 660, size: 12, font });
+  page.drawText(dob,             { x: 50, y: 660, size: 12, font });
+  page.drawText(gender,          { x: 150, y: 660, size: 12, font });
   page.drawText(address,         { x: 50, y: 640, size: 12, font });
 
-  // Save and trigger download
   const pdfBytes = await pdfDoc.save();
   saveAs(new Blob([pdfBytes], { type: 'application/pdf' }), '申請フォーム.pdf');
 }
