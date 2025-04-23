@@ -14,12 +14,29 @@
   <h1>介護保険申請フォーム</h1>
   <p>以下の項目をご入力のうえ、「PDF生成」ボタンを押してください。</p>
 
-  <form id="careForm">
+    <form id="careForm">
+    <label>申請年月日：<input type="date" id="applicationDate" required></label><br>
+    <label>介護保険被保険者番号：<input type="text" id="insuredNumber" required></label><br>
+    <label>マイナンバー：<input type="text" id="myNumber" required></label><br>
+    <label>（医療保険）保険者名：<input type="text" id="insurerName" required></label><br>
+    <label>（医療保険）保険者番号：<input type="text" id="insurerNumber" required></label><br>
+    <label>（医療保険）記号：<input type="text" id="medicalSymbol" required></label><br>
+    <label>（医療保険）番号：<input type="text" id="medicalNumber" required></label><br>
+    <label>（医療保険）枝番：<input type="text" id="medicalBranch" required></label><br>
+    <label>フリガナ：<input type="text" id="furigana" required></label><br>
     <label>氏名：<input type="text" id="name" required></label><br>
     <label>生年月日：<input type="date" id="dob" required></label><br>
-    <!-- 他の項目は追って追加します -->
+    <label>性別：
+      <select id="gender" required>
+        <option value="">選択してください</option>
+        <option value="男">男</option>
+        <option value="女">女</option>
+      </select>
+    </label><br>
+    <label>住所：<input type="text" id="address" required></label><br>
     <button type="button" onclick="generatePDF()">PDF生成</button>
   </form>
+
 
   <script src="form.js"></script>
 </body>
