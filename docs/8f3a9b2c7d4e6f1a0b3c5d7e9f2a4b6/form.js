@@ -5,7 +5,7 @@ const eraMap = {
   '令和': 2018,
   '平成': 1988,
   '昭和': 1925,
-  // '大正': 1911, // add if needed
+  '大正': 1911,  // added Taisho era
 };
 
 // Initialize dropdowns when DOM is ready
