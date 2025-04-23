@@ -24,9 +24,8 @@
     <label>フリガナ：<input type="text" id="furigana" required></label><br>
     <label>氏名：<input type="text" id="name" required></label><br>
 
-    <label>生年月日（和暦）：</label><br>
-    <label>
-      元号：
+    <!-- 生年月日（和暦）：元号・年・月・日のプルダウンを同一行に表示 -->
+    <label>生年月日（和暦）：
       <select id="era" required>
         <option value="">--元号--</option>
         <option value="明治">明治</option>
@@ -35,20 +34,16 @@
         <option value="平成">平成</option>
         <option value="令和">令和</option>
       </select>
-    </label>
-    <label>
-      月：
+      <select id="eraYear" required>
+        <option value="">--年--</option>
+      </select>
       <select id="month" required>
         <option value="">--月--</option>
       </select>
-    </label>
-    <label>
-      日：
       <select id="day" required>
         <option value="">--日--</option>
       </select>
-    </label>
-    <br>
+    </label><br>
 
     <label>性別：
       <select id="gender" required>
