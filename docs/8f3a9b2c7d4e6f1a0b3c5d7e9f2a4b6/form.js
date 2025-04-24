@@ -32,18 +32,38 @@ function initDropdown(eraId, yearId, monthId, dayId) {
   }
 }
 
-// 西暦年・月・日から ISO 日付 (YYYY-MM-DD) を組み立て
-function getISO(yearId, monthId, dayId) {
-  const y = parseInt(document.getElementById(yearId).value, 10);
-  const m = String(document.getElementById(monthId).value).padStart(2, '0');
-  const d = String(document.getElementById(dayId).value).padStart(2, '0');
-  if (isNaN(y)) return '';
-  return `${y}-${m}-${d}`;
+// 元号 + 年／月／日 から ISO 日付 (YYYY-MM-DD) を組み立て
+function getISO(eraId, yearId, monthId, dayId) {
+  const era = document.getElementById(eraId)?.value;
+  const y   = parseInt(document.getElementById(yearId)?.value, 10);
+  const m   = String(document.getElementById(monthId)?.value).padStart(2, '0');
+  const d   = String(document.getElementById(dayId)?.value).padStart(2, '0');
+  if (!eraMap[era] || isNaN(y)) return '';
+  return `${eraMap[era] + y - 1}-${m}-${d}`;
 }
 
-
-// フォーム入力を PDF に埋め込んで生成・ダウンロード
 async function generatePDF() {
+  // ───────────────────────────────
+  // 1) この行だけクリックハンドラ直下で同期的に呼ぶ
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/.test(navigator.userAgent);
+  const newWin   = isMobile ? window.open('', '_blank') : null;
+  // ───────────────────────────────
+
+  // 2) テンプレートPDF 読み込み etc...
+  const formBytes = await fetch('./blank_form.pdf').then(r => r.arrayBuffer());
+  const { PDFDocument } = PDFLib;
+  const pdfDoc = await PDFDocument.load(formBytes);
+
+  pdfDoc.registerFontkit(window.fontkit);
+  const fontBytes = await fetch('./NotoSansJP-VariableFont_wght.ttf')
+    .then(r => r.arrayBuffer());
+  const customFont = await pdfDoc.embedFont(fontBytes);
+
+  const page = pdfDoc.getPage(0);
+  const fontSize = 12;
+  let x = 40, y = page.getHeight() - 50;
+
+  // 5) フォームからデータ取得
   const data = {
     '申請年月日': document.getElementById('applicationDate').value,
     '被保険者番号': document.getElementById('insuredNumber').value,
@@ -83,40 +103,46 @@ async function generatePDF() {
     '特定疾病名': document.getElementById('diseaseName').value
   };
 
-  const { PDFDocument, StandardFonts } = PDFLib;
-  const pdfDoc = await PDFDocument.create();
-  let page = pdfDoc.addPage([595.28, 841.89]);
-  const font = await pdfDoc.embedFont(StandardFonts.HELVETICA);
-  const fontSize = 12;
-  let x = 40, y = page.getHeight() - 50;
-
+  // 6) テキストを描画
   Object.entries(data).forEach(([label, val]) => {
-    page.drawText(`${label}：${val}`, { x, y, size: fontSize, font });
+    page.drawText(`${label}：${val}`, { x, y, size: fontSize, font: customFont });
     y -= fontSize + 6;
-    if (y < 50) {
-      page = pdfDoc.addPage([595.28, 841.89]);
-      y = page.getHeight() - 50;
-    }
   });
 
+  // 3) PDF をバイト列に
   const pdfBytes = await pdfDoc.save();
-  saveAs(new Blob([pdfBytes], { type: 'application/pdf' }), 'kaigo_shinsei.pdf');
+
+  // 4) モバイル／デスクトップで保存方法を分ける
+  const blob    = new Blob([pdfBytes], { type: 'application/pdf' });
+  const blobUrl = URL.createObjectURL(blob);
+
+  if (isMobile) {
+    // クリック直後に開いておいたウィンドウに PDF を表示
+    newWin.location.href = blobUrl;
+  } else {
+    // デスクトップは FileSaver.js におまかせ
+    saveAs(blob, 'filled_form.pdf');
+  }
 }
 
-// DOM 串刺し後に初期化＆ボタン登録
+// DOM 読み込み後に初期化
 window.addEventListener('DOMContentLoaded', () => {
-  // 生年月日（西暦年／月／日）のプルダウン初期化
-  initDropdown('eraYear', 'eraYear', 'month', 'day');
+  // 生年月日（和暦）
+  initDropdown('era', 'eraYear', 'month', 'day');
 
-  // その他フィールドの年／月／日プルダウン初期化
-  initDropdown('validYearStart', 'validYearStart', 'validMonthStart', 'validDayStart');
-  initDropdown('validYearEnd',   'validYearEnd',   'validMonthEnd',   'validDayEnd');
-  initDropdown('facilityYearStart', 'facilityYearStart', 'facilityMonthStart', 'facilityDayStart');
-  initDropdown('facilityYearEnd',   'facilityYearEnd',   'facilityMonthEnd',   'facilityDayEnd');
-  initDropdown('medicalYearStart',  'medicalYearStart',  'medicalMonthStart',  'medicalDayStart');
-  initDropdown('medicalYearEnd',    'medicalYearEnd',    'medicalMonthEnd',    'medicalDayEnd');
+  // 有効期間（和暦）
+  initDropdown('validEraStart', 'validYearStart', 'validMonthStart', 'validDayStart');
+  initDropdown('validEraEnd', 'validYearEnd', 'validMonthEnd', 'validDayEnd');
 
-  // PDF生成ボタンにハンドラをセット
+  // 入所期間
+  initDropdown('facilityEraStart', 'facilityYearStart', 'facilityMonthStart', 'facilityDayStart');
+  initDropdown('facilityEraEnd', 'facilityYearEnd', 'facilityMonthEnd', 'facilityDayEnd');
+
+  // 医療期間
+  initDropdown('medicalEraStart', 'medicalYearStart', 'medicalMonthStart', 'medicalDayStart');
+  initDropdown('medicalEraEnd', 'medicalYearEnd', 'medicalMonthEnd', 'medicalDayEnd');
+
+  // PDF生成ボタン
   document.querySelector('button[type="button"]').addEventListener('click', generatePDF);
 });
-
+// ここまで

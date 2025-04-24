@@ -4,8 +4,6 @@
   <meta charset="UTF-8">
   <meta name="google" content="notranslate">
   <title>介護保険申請フォーム</title>
-  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   <style>
     body { font-family: sans-serif; padding: 20px; }
     fieldset { margin: 16px 0; padding: 12px; border: 1px solid #ccc; border-radius: 4px; }
@@ -52,20 +50,13 @@
         <input type="text" id="furigana" required>
       </div>
       <div class="inline">
-        <label>生年月日</label>
-        <select id="eraYear" required>
-          <option value="">年</option>
-          <!-- 年プルダウンは JavaScript で 1〜99 を追加 -->
-        </select>
-        <select id="month" required>
-          <option value="">月</option>
-          <!-- 月プルダウンは JavaScript で 1〜12 を追加 -->
-        </select>
-        <select id="day" required>
-          <option value="">日</option>
-          <!-- 日プルダウンは JavaScript で 1〜31 を追加 -->
-        </select>
-      </div>      
+        <label for="era">生年月日</label>
+        <select id="era" required><option value="">元号</option></select>
+        <select id="eraYear" required><option value="">年</option></select>
+        <select id="month" required><option value="">月</option></select>
+        <select id="day" required><option value="">日</option></select>
+      </div>
+            
       <div class="inline">
         <label for="name">氏名</label>
         <input type="text" id="name" required>
@@ -194,98 +185,13 @@
     <button type="button">PDF生成</button>
   </form>
 
-  <script>
-    const eraMap = { 明治:1868, 大正:1912, 昭和:1926, 平成:1989, 令和:2019 };
-    function initDropdown(eraId, yearId, monthId, dayId) {
-      const eraSel   = document.getElementById(eraId);
-      const yearSel  = document.getElementById(yearId);
-      const monthSel = document.getElementById(monthId);
-      const daySel   = document.getElementById(dayId);
-      if (eraSel) Object.keys(eraMap).forEach(e => eraSel.add(new Option(e, e)));
-      if (yearSel) for (let y = 1; y <= 99; y++) yearSel.add(new Option(`${y}年`, y));
-      if (monthSel) for (let m = 1; m <= 12; m++) monthSel.add(new Option(`${m}月`, m));
-      if (daySel) for (let d = 1; d <= 31; d++) daySel.add(new Option(`${d}日`, d));
-    }
-
-    function getISO(eraId, yearId, monthId, dayId) {
-      const era = document.getElementById(eraId)?.value;
-      const y   = parseInt(document.getElementById(yearId)?.value, 10);
-      const m   = String(document.getElementById(monthId)?.value).padStart(2, '0');
-      const d   = String(document.getElementById(dayId)?.value).padStart(2, '0');
-      if (!eraMap[era] || isNaN(y)) return '';
-      return `${eraMap[era] + y - 1}-${m}-${d}`;
-    }
-
-    async function generatePDF() {
-      const data = {
-        applicationDate: document.getElementById('applicationDate').value,
-        insuredNumber:   document.getElementById('insuredNumber').value,
-        myNumber:        document.getElementById('myNumber').value,
-        insurerName:     document.getElementById('insurerName').value,
-        insurerNumber:   document.getElementById('insurerNumber').value,
-        medicalSymbol:   document.getElementById('medicalSymbol').value,
-        medicalNumber:   document.getElementById('medicalNumber').value,
-        medicalBranch:   document.getElementById('medicalBranch').value,
-        furigana:        document.getElementById('furigana').value,
-        name:            document.getElementById('name').value,
-        dob:             getISO('era', 'eraYear', 'month', 'day'),
-        gender:          document.getElementById('gender').value,
-        address:         document.getElementById('address').value,
-        phoneNumber:     document.getElementById('phoneNumber').value,
-        careLevel:       document.getElementById('careLevel').value,
-        validStart:      getISO('validEraStart', 'validYearStart', 'validMonthStart', 'validDayStart'),
-        validEnd:        getISO('validEraEnd', 'validYearEnd', 'validMonthEnd', 'validDayEnd'),
-        facilityName:    document.getElementById('facilityName').value,
-        facilityStart:   getISO('facilityEraStart', 'facilityYearStart', 'facilityMonthStart', 'facilityDayStart'),
-        facilityEnd:     getISO('facilityEraEnd', 'facilityYearEnd', 'facilityMonthEnd', 'facilityDayEnd'),
-        medicalName:     document.getElementById('medicalName').value,
-        medicalStart:    getISO('medicalEraStart', 'medicalYearStart', 'medicalMonthStart', 'medicalDayStart'),
-        medicalEnd:      getISO('medicalEraEnd', 'medicalYearEnd', 'medicalMonthEnd', 'medicalDayEnd'),
-        agentType:       document.getElementById('agentType').value,
-        agentName:       document.getElementById('agentName').value,
-        agentAddress:    document.getElementById('agentAddress').value,
-        agentTel:        document.getElementById('agentTel').value,
-        agentOtherName:  document.getElementById('agentOtherName').value,
-        relation:        document.getElementById('relation').value,
-        agentOtherAddress: document.getElementById('agentOtherAddress').value,
-        agentOtherTel:   document.getElementById('agentOtherTel').value,
-        doctorName:      document.getElementById('doctorName').value,
-        doctorHospital:  document.getElementById('doctorHospital').value,
-        doctorAddress:   document.getElementById('doctorAddress').value,
-        doctorTel:       document.getElementById('doctorTel').value,
-        diseaseName:     document.getElementById('diseaseName').value
-      };
-      const { PDFDocument, StandardFonts } = PDFLib;
-      const pdfDoc = await PDFDocument.create();
-      let page = pdfDoc.addPage([595.28, 841.89]);
-      const font = await pdfDoc.embedFont(StandardFonts.HELVETICA);
-      const fontSize = 12;
-      let x = 40;
-      let y = page.getHeight() - 50;
-
-      Object.entries(data).forEach(([key, value]) => {
-        const labelEl = document.querySelector(`label[for="${key}"]`);
-        const text = (labelEl ? labelEl.textContent : key) + '：' + (value || '');
-        page.drawText(text, { x, y, size: fontSize, font });
-        y -= fontSize + 6;
-        if (y < 50) {
-          page = pdfDoc.addPage([595.28, 841.89]);
-          y = page.getHeight() - 50;
-        }
-      });
-
-      const pdfBytes = await pdfDoc.save();
-      saveAs(new Blob([pdfBytes], { type: 'application/pdf' }), 'kaigo_shinsei.pdf');
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      // ドロップダウン初期化
-      ['era','validEraStart','validEraEnd','facilityEraStart','facilityEraEnd','medicalEraStart','medicalEraEnd'].forEach(id => {
-        initDropdown(id, id.replace(/Era/, 'Year'), id.replace(/EraStart|EraEnd/, 'Month'), id.replace(/EraStart|EraEnd/, 'Day'));
-      });
-      // PDF生成ボタン
-      document.querySelector('button[type="button"]').addEventListener('click', generatePDF);
-    });
-  </script>
-</body>
-</html>
+  <!-- 1) pdf-lib -->
+  <script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+  <!-- 2) file-saver -->
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+ <!-- 3) PDF-LIB 用 fontkit -->
+  <script src="https://unpkg.com/@pdf-lib/fontkit@1.1.0/dist/fontkit.umd.min.js"></script>
+  <!-- 4) form.js -->
+  <script src="./form.js"></script>
+  </body>
+  </html>
