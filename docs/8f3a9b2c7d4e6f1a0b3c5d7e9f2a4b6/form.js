@@ -113,27 +113,25 @@ async function generatePDF() {
     const pdfBytes = await pdfDoc.save();
 
     // 4) モバイル／デスクトップで保存方法を分ける
-    const blob    = new Blob([pdfBytes], { type: 'application/pdf' });
-    const blobUrl = URL.createObjectURL(blob);
-  
-    if (isMobile) {
-      // モバイルでは <a download> リンクを自動クリックしてダウンロード
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = 'filled_form.pdf';
-      // Safari 対策で新規タブも指定
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      // デスクトップはこれまで通り FileSaver.js
-      saveAs(blob, 'filled_form.pdf');
-    }
-  
-    // オブジェクト URL を解放
-    URL.revokeObjectURL(blobUrl);
-  
+const blob    = new Blob([pdfBytes], { type: 'application/pdf' });
+const blobUrl = URL.createObjectURL(blob);
+
+if (isMobile) {
+  // モバイルでは <a download> リンクを自動クリックしてダウンロード（同一タブでプレビュー）
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.download = 'filled_form.pdf';
+  // Safariでは target を指定しないことで同一タブでプレビューに遷移
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+} else {
+  // デスクトップはこれまで通り FileSaver.js
+  saveAs(blob, 'filled_form.pdf');
+}
+
+// オブジェクト URL を解放
+URL.revokeObjectURL(blobUrl); 
 }
 
 // DOM 読み込み後に初期化
