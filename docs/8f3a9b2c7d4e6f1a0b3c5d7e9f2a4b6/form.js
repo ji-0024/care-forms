@@ -121,7 +121,6 @@ if (isMobile) {
   const link = document.createElement('a');
   link.href = blobUrl;
   link.download = 'filled_form.pdf';
-  // Safariでは target を指定しないことで同一タブでプレビューに遷移
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -131,7 +130,8 @@ if (isMobile) {
 }
 
 // オブジェクト URL を解放
-URL.revokeObjectURL(blobUrl); 
+URL.revokeObjectURL(blobUrl);
+ 
 }
 
 // DOM 読み込み後に初期化
