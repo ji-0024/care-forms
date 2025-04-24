@@ -109,20 +109,31 @@ async function generatePDF() {
     y -= fontSize + 6;
   });
 
-  // 3) PDF をバイト列に
-  const pdfBytes = await pdfDoc.save();
+    // 3) PDF をバイト列に
+    const pdfBytes = await pdfDoc.save();
 
-  // 4) モバイル／デスクトップで保存方法を分ける
-  const blob    = new Blob([pdfBytes], { type: 'application/pdf' });
-  const blobUrl = URL.createObjectURL(blob);
-
-  if (isMobile) {
-    // クリック直後に開いておいたウィンドウに PDF を表示
-    newWin.location.href = blobUrl;
-  } else {
-    // デスクトップは FileSaver.js におまかせ
-    saveAs(blob, 'filled_form.pdf');
-  }
+    // 4) モバイル／デスクトップで保存方法を分ける
+    const blob    = new Blob([pdfBytes], { type: 'application/pdf' });
+    const blobUrl = URL.createObjectURL(blob);
+  
+    if (isMobile) {
+      // モバイルでは <a download> リンクを自動クリックしてダウンロード
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = 'filled_form.pdf';
+      // Safari 対策で新規タブも指定
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      // デスクトップはこれまで通り FileSaver.js
+      saveAs(blob, 'filled_form.pdf');
+    }
+  
+    // オブジェクト URL を解放
+    URL.revokeObjectURL(blobUrl);
+  
 }
 
 // DOM 読み込み後に初期化
