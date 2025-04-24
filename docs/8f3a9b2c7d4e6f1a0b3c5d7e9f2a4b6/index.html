@@ -50,18 +50,17 @@
         <input type="text" id="furigana" required>
       </div>
       <div class="inline">
+        <label for="name">氏名</label>
+        <input type="text" id="name" required>
+        <label for="gender">性別</label>
+        <select id="gender" required><option value="">選択</option><option>男</option><option>女</option></select>
+      </div>
+      <div class="inline">
         <label for="era">生年月日</label>
         <select id="era" required><option value="">元号</option></select>
         <select id="eraYear" required><option value="">年</option></select>
         <select id="month" required><option value="">月</option></select>
         <select id="day" required><option value="">日</option></select>
-      </div>
-            
-      <div class="inline">
-        <label for="name">氏名</label>
-        <input type="text" id="name" required>
-        <label for="gender">性別</label>
-        <select id="gender" required><option value="">選択</option><option>男</option><option>女</option></select>
       </div>
       <div class="inline">
         <label for="address">住所</label>
@@ -182,7 +181,148 @@
     <label for="diseaseName">特定疾病名（2号被保険者のみ）</label>
     <input type="text" id="diseaseName"><br>
 
+    <!-- ここから２ページ目：調査日時相談者 -->
+<fieldset>
+  <legend>調査日時相談者</legend>
+
+  <!-- 本人 -->
+  <div class="inline">
+    <label for="investigator_self_tel_home">本人 電話番号（自宅）</label>
+    <input type="tel" id="investigator_self_tel_home" name="investigator_self_tel_home">
+    <label for="investigator_self_tel_mobile">携帯</label>
+    <input type="tel" id="investigator_self_tel_mobile" name="investigator_self_tel_mobile">
+  </div>
+
+  <!-- 担当CM：事業所名 -->
+  <div class="inline">
+    <label for="cm_office">担当CM 事業所名</label>
+    <input type="text" id="cm_office" name="cm_office">
+  </div>
+
+  <!-- 担当CM：氏名＋調査同行 -->
+  <div class="inline">
+    <label for="cm_name">担当CM 氏名</label>
+    <input type="text" id="cm_name" name="cm_name">
+    <label for="cm_accompany">調査同行</label>
+    <select id="cm_accompany" name="cm_accompany">
+      <option value="">選択</option>
+      <option value="有">有</option>
+      <option value="無">無</option>
+    </select>
+  </div>
+
+  <!-- 担当CM：電話番号 -->
+  <div class="inline">
+    <label for="cm_tel_work">担当CM 電話番号（職場）</label>
+    <input type="tel" id="cm_tel_work" name="cm_tel_work">
+    <label for="cm_tel_mobile">携帯</label>
+    <input type="tel" id="cm_tel_mobile" name="cm_tel_mobile">
+  </div>
+
+  <!-- 上記以外 -->
+  <div class="inline">
+    <label for="other_investigator_name">上記以外 氏名</label>
+    <input type="text" id="other_investigator_name" name="other_investigator_name">
+    <label for="other_investigator_accompany">調査同行</label>
+    <select id="other_investigator_accompany" name="other_investigator_accompany">
+      <option value="">選択</option>
+      <option value="有">有</option>
+      <option value="無">無</option>
+    </select>
+  </div>
+
+  <!-- 被保険者との関係 -->
+<div class="inline">
+  <label>被保険者との関係</label>
+  <span>家族</span>
+  <label for="relation_detail">続柄</label>
+  <input type="text" id="relation_detail" name="relation_detail">
+  <label for="relation_other">その他</label>
+  <input type="text" id="relation_other" name="relation_other">
+</div>
+</fieldset>
+<!-- 訪問調査先（住民票と違う場合） -->
+<fieldset>
+  <legend>訪問調査先（住民票と違う場合）</legend>
+  <div class="inline">
+    <label for="visit_facility">入院・入所施設名等</label>
+    <input type="text" id="visit_facility" name="visit_facility">
+  </div>
+  <div class="inline">
+    <label for="visit_address">住所</label>
+    <input type="text" id="visit_address" name="visit_address" placeholder="マンション等は棟名・部屋番号まで">
+  </div>
+  <div class="inline">
+    <label for="visit_tel">電話番号</label>
+    <input type="tel" id="visit_tel" name="visit_tel">
+  </div>
+</fieldset>
+
+<!-- 同居人の状況 -->
+<fieldset>
+  <legend>同居人の状況</legend>
+  <div class="inline">
+    <input type="checkbox" id="cohabit_none" name="cohabit_none">
+    <label for="cohabit_none">無（独居）</label>
+
+    <input type="checkbox" id="cohabit_spouse" name="cohabit_spouse">
+    <label for="cohabit_spouse">配偶者</label>
+
+    <input type="checkbox" id="cohabit_child" name="cohabit_child">
+    <label for="cohabit_child">子ども</label>
+    <input type="text" id="cohabit_child_detail" name="cohabit_child_detail" placeholder="人数など">
+
+    <input type="checkbox" id="cohabit_other" name="cohabit_other">
+    <label for="cohabit_other">その他</label>
+    <input type="text" id="cohabit_other_detail" name="cohabit_other_detail" placeholder="続柄等">
+  </div>
+</fieldset>
+
+
+<!-- 介護サービスの利用状況 -->
+<fieldset>
+  <legend>介護サービスの利用状況</legend>
+  <div class="inline">
+    <input type="checkbox" id="svc_home_help" name="svc_home_help">
+    <label for="svc_home_help">訪問介護（ホームヘルプ）</label>
+    <input type="text" id="svc_home_help_detail" name="svc_home_help_detail" placeholder="内容">
+  </div>
+  <div class="inline">
+    <input type="checkbox" id="svc_day_service" name="svc_day_service">
+    <label for="svc_day_service">通所介護（デイサービス）</label>
+    <input type="text" id="svc_day_service_detail" name="svc_day_service_detail" placeholder="内容">
+  </div>
+  <div class="inline">
+    <input type="checkbox" id="svc_short_stay" name="svc_short_stay">
+    <label for="svc_short_stay">短期入所生活介護（ショートステイ）</label>
+    <input type="text" id="svc_short_stay_detail" name="svc_short_stay_detail" placeholder="内容">
+  </div>
+  <div class="inline">
+    <input type="checkbox" id="svc_welfare_equipment" name="svc_welfare_equipment">
+    <label for="svc_welfare_equipment">福祉用具の貸与</label>
+  </div>
+  <div class="inline">
+    <input type="checkbox" id="svc_other" name="svc_other">
+    <label for="svc_other">その他</label>
+    <input type="text" id="svc_other_detail" name="svc_other_detail" placeholder="内容">
+  </div>
+</fieldset>
+
+<!-- 備考 -->
+<fieldset>
+  <legend>備考</legend>
+  <div class="inline">
+    <label for="remarks">※新規申請の方は申請理由もご記入ください。<br>
+    （調査時に留意してほしいこと、通院等で都合の悪い曜日、入院中の方は退院予定日など）</label>
+    <textarea id="remarks" name="remarks" rows="4" style="width:100%;" placeholder="ご自由にご記入ください"></textarea>
+  </div>
+</fieldset>
+
+
+
     <button type="button">PDF生成</button>
+
+    
   </form>
 
   <!-- 1) pdf-lib -->

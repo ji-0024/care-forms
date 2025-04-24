@@ -55,16 +55,17 @@ async function generatePDF() {
   const pdfDoc = await PDFDocument.load(formBytes);
 
   pdfDoc.registerFontkit(window.fontkit);
-  const fontBytes = await fetch('./NotoSansJP-VariableFont_wght.ttf')
-    .then(r => r.arrayBuffer());
+  const fontBytes = await fetch('./NotoSansJP-VariableFont_wght.ttf').then(r => r.arrayBuffer());
   const customFont = await pdfDoc.embedFont(fontBytes);
 
-  const page = pdfDoc.getPage(0);
   const fontSize = 12;
-  let x = 40, y = page.getHeight() - 50;
 
-  // 5) フォームからデータ取得
-  const data = {
+  // ───────────────────────────────
+  // 3) １ページ目の描画
+  const page1 = pdfDoc.getPage(0);
+  let x1 = 40, y1 = page1.getHeight() - 50;
+
+  const dataPage1 = {
     '申請年月日': document.getElementById('applicationDate').value,
     '被保険者番号': document.getElementById('insuredNumber').value,
     'マイナンバー': document.getElementById('myNumber').value,
@@ -80,14 +81,14 @@ async function generatePDF() {
     '住所': document.getElementById('address').value,
     '電話番号': document.getElementById('phoneNumber').value,
     '要介護区分': document.getElementById('careLevel').value,
-    '有効期間開始': getISO('validEraStart', 'validYearStart', 'validMonthStart', 'validDayStart'),
-    '有効期間終了': getISO('validEraEnd', 'validYearEnd', 'validMonthEnd', 'validDayEnd'),
+    '有効期間開始': getISO('validEraStart','validYearStart','validMonthStart','validDayStart'),
+    '有効期間終了': getISO('validEraEnd','validYearEnd','validMonthEnd','validDayEnd'),
     '入所施設名': document.getElementById('facilityName').value,
-    '入所開始': getISO('facilityEraStart', 'facilityYearStart', 'facilityMonthStart', 'facilityDayStart'),
-    '入所終了': getISO('facilityEraEnd', 'facilityYearEnd', 'facilityMonthEnd', 'facilityDayEnd'),
+    '入所開始': getISO('facilityEraStart','facilityYearStart','facilityMonthStart','facilityDayStart'),
+    '入所終了': getISO('facilityEraEnd','facilityYearEnd','facilityMonthEnd','facilityDayEnd'),
     '医療機関名': document.getElementById('medicalName').value,
-    '医療開始': getISO('medicalEraStart', 'medicalYearStart', 'medicalMonthStart', 'medicalDayStart'),
-    '医療終了': getISO('medicalEraEnd', 'medicalYearEnd', 'medicalMonthEnd', 'medicalDayEnd'),
+    '医療開始': getISO('medicalEraStart','medicalYearStart','medicalMonthStart','medicalDayStart'),
+    '医療終了': getISO('medicalEraEnd','medicalYearEnd','medicalMonthEnd','medicalDayEnd'),
     '提出者種別': document.getElementById('agentType').value,
     '提出者名称': document.getElementById('agentName').value,
     '提出者住所': document.getElementById('agentAddress').value,
@@ -100,38 +101,84 @@ async function generatePDF() {
     '医療機関': document.getElementById('doctorHospital').value,
     '医師住所': document.getElementById('doctorAddress').value,
     '医師電話': document.getElementById('doctorTel').value,
-    '特定疾病名': document.getElementById('diseaseName').value
+    '特定疾病名': document.getElementById('diseaseName').value,
   };
 
-  // 6) テキストを描画
-  Object.entries(data).forEach(([label, val]) => {
-    page.drawText(`${label}：${val}`, { x, y, size: fontSize, font: customFont });
-    y -= fontSize + 6;
+  Object.entries(dataPage1).forEach(([label, val]) => {
+    page1.drawText(`${label}：${val}`, { x: x1, y: y1, size: fontSize, font: customFont });
+    y1 -= fontSize + 6;
   });
+  // ───────────────────────────────
 
-    // 3) PDF をバイト列に
-    const pdfBytes = await pdfDoc.save();
+  // ───────────────────────────────
+  // 4) ２ページ目の描画
+  const page2 = pdfDoc.getPage(1);
+  let x2 = 40, y2 = page2.getHeight() - 50;
 
-    // 4) モバイル／デスクトップで保存方法を分ける
-const blob    = new Blob([pdfBytes], { type: 'application/pdf' });
-const blobUrl = URL.createObjectURL(blob);
+  const dataPage2 = {
+    // 調査日時相談者
+    '本人（自宅TEL）': document.getElementById('investigator_self_tel_home').value,
+    '本人（携帯TEL）': document.getElementById('investigator_self_tel_mobile').value,
+    '担当CM 事業所名': document.getElementById('cm_office').value,
+    '担当CM 氏名': document.getElementById('cm_name').value,
+    '調査同行（担当CM）': document.getElementById('cm_accompany').value,
+    '担当CM（職場TEL）': document.getElementById('cm_tel_work').value,
+    '担当CM（携帯TEL）': document.getElementById('cm_tel_mobile').value,
+    '上記以外 氏名': document.getElementById('other_investigator_name').value,
+    '上記以外 調査同行': document.getElementById('other_investigator_accompany').value,
+    '被保険者との関係': '家族',
+    '続柄': document.getElementById('relation_detail').value,
+    '関係その他': document.getElementById('relation_other').value,
 
-if (isMobile) {
-  // モバイルでは <a download> リンクを自動クリックしてダウンロード（同一タブでプレビュー）
-  const link = document.createElement('a');
-  link.href = blobUrl;
-  link.download = 'filled_form.pdf';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-} else {
-  // デスクトップはこれまで通り FileSaver.js
-  saveAs(blob, 'filled_form.pdf');
-}
+    // 訪問調査先〜備考
+    '訪問調査先 施設名': document.getElementById('visit_facility').value,
+    '訪問調査先 住所': document.getElementById('visit_address').value,
+    '訪問調査先 電話番号': document.getElementById('visit_tel').value,
 
-// オブジェクト URL を解放
-URL.revokeObjectURL(blobUrl);
- 
+    '同居人 無（独居）': document.getElementById('cohabit_none').checked ? '有' : '無',
+    '同居人 配偶者': document.getElementById('cohabit_spouse').checked ? '有' : '無',
+    '同居人 子ども': document.getElementById('cohabit_child').checked ? '有' : '無',
+    '同居人 子ども 詳細': document.getElementById('cohabit_child_detail').value,
+    '同居人 その他': document.getElementById('cohabit_other').checked ? '有' : '無',
+    '同居人 その他 詳細': document.getElementById('cohabit_other_detail').value,
+
+    '訪問介護(ホームヘルプ)': document.getElementById('svc_home_help').checked ? '有' : '無',
+    '訪問介護 詳細': document.getElementById('svc_home_help_detail').value,
+    '通所介護(デイサービス)': document.getElementById('svc_day_service').checked ? '有' : '無',
+    '通所介護 詳細': document.getElementById('svc_day_service_detail').value,
+    '短期入所生活介護(ショートステイ)': document.getElementById('svc_short_stay').checked ? '有' : '無',
+    '短期入所生活介護 詳細': document.getElementById('svc_short_stay_detail').value,
+    '福祉用具の貸与': document.getElementById('svc_welfare_equipment').checked ? '有' : '無',
+    'その他サービス': document.getElementById('svc_other').checked ? '有' : '無',
+    'その他サービス 詳細': document.getElementById('svc_other_detail').value,
+
+    '備考': document.getElementById('remarks').value,
+  };
+
+  Object.entries(dataPage2).forEach(([label, val]) => {
+    page2.drawText(`${label}：${val}`, { x: x2, y: y2, size: fontSize, font: customFont });
+    y2 -= fontSize + 6;
+  });
+  // ───────────────────────────────
+
+  // 5) PDF をバイト列に
+  const pdfBytes = await pdfDoc.save();
+
+  // 6) モバイル／デスクトップで保存方法を分ける
+  const blob    = new Blob([pdfBytes], { type: 'application/pdf' });
+  const blobUrl = URL.createObjectURL(blob);
+
+  if (isMobile) {
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = 'filled_form.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } else {
+    saveAs(blob, 'filled_form.pdf');
+  }
+  URL.revokeObjectURL(blobUrl);
 }
 
 // DOM 読み込み後に初期化
