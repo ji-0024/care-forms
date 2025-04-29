@@ -161,24 +161,21 @@ async function generatePDF() {
   });
   // ───────────────────────────────
 
-  // 5) PDF をバイト列に
-  const pdfBytes = await pdfDoc.save();
+ // 5) PDF をバイト列に
+ const pdfBytes = await pdfDoc.save();
+ const blob     = new Blob([pdfBytes], { type: 'application/pdf' });
+ const blobUrl  = URL.createObjectURL(blob);
 
-  // 6) モバイル／デスクトップで保存方法を分ける
-  const blob    = new Blob([pdfBytes], { type: 'application/pdf' });
-  const blobUrl = URL.createObjectURL(blob);
+ // 6) アンカークリックでダウンロード（PC・モバイル共通）
+ const link = document.createElement('a');
+ link.href = blobUrl;
+ link.download = 'filled_form.pdf';
+ document.body.appendChild(link);
+ link.click();
+ document.body.removeChild(link);
 
-  if (isMobile) {
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = 'filled_form.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } else {
-    saveAs(blob, 'filled_form.pdf');
-  }
-  URL.revokeObjectURL(blobUrl);
+ // 後始末
+ URL.revokeObjectURL(blobUrl);
 }
 
 // DOM 読み込み後に初期化
