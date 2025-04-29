@@ -43,11 +43,7 @@ function getISO(eraId, yearId, monthId, dayId) {
 }
 
 async function generatePDF() {
-  // ───────────────────────────────
-  // 1) この行だけクリックハンドラ直下で同期的に呼ぶ
-  const isMobile = /Mobi|Android|iPhone|iPad|iPod/.test(navigator.userAgent);
-  const newWin   = isMobile ? window.open('', '_blank') : null;
-  // ───────────────────────────────
+
 
   // 2) テンプレートPDF 読み込み etc...
   const formBytes = await fetch('./blank_form.pdf').then(r => r.arrayBuffer());
